@@ -21,6 +21,8 @@ pids/
 *.pid
 *.seed
 *.pid.lock
+uploads/*
+!uploads/.gitkeep
 
 # Test coverage
 coverage/
