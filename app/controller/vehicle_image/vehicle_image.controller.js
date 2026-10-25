@@ -132,6 +132,14 @@ exports.getImagesByVehicleId = async (req, res) => {
   try {
     const { vehicle_id } = req.params;
 
+    const vehicle = await VehicleInfo.findByPk(vehicle_id);
+    if (!vehicle) {
+      return res.status(404).json({
+        success: false,
+        message: "No vehicle has been found against provided vehicle id",
+      });
+    }
+
     const images = await VehicleImage.findAll({
       where: { vehicle_id },
     });

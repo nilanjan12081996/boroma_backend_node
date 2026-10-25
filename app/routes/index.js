@@ -9,6 +9,7 @@ const VehicleImageRoutes = require('./vehicle_image/vehicle_image.routes')
 const CategoryVehicleMapRoutes = require('./category_vehical_map/category_vehical_map.routes')
 
 router.use('/category',CategoryRoutes)
+router.use('/admin',AdminRoutes)
 router.use('/api/admin',AdminRoutes)
 router.use('/vehicle-info', VehicleInfoRoutes)
 router.use('/vehicle-image', VehicleImageRoutes)

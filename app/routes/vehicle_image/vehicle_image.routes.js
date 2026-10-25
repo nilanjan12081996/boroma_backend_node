@@ -6,7 +6,7 @@ const uploadImage = require("../../utils/multer");
 const authCheck = require("../../middleware/authCheck");
 const checkRole = require("../../middleware/checkRole");
 
-// router.use(authCheck, checkRole("SUPERADMIN"));
+router.use(authCheck, checkRole("SUPERADMIN"));
 
 // Middleware to handle image uploads cleanly (supports 'images', 'image', or any field name)
 // const handleUpload = (req, res, next) => {

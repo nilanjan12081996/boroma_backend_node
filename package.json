@@ -18,6 +18,7 @@
     "multer": "^2.4.0",
     "mysql2": "^3.24.5",
     "nodemon": "^3.1.14",
-    "sequelize": "^6.37.8"
+    "sequelize": "^6.37.8",
+    "swagger-ui-express": "^5.0.1"
   }
 }

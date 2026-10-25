@@ -1,6 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const mappingController = require("../../controller/category_vehical_map/category_vehical_map.controller");
+const authCheck = require("../../middleware/authCheck");
+const checkRole = require("../../middleware/checkRole");
+
+
+router.use(authCheck, checkRole("SUPERADMIN"));
 
 // Map vehicle to one or multiple categories
 router.post("/save", mappingController.createCategoryVehicleMap);
