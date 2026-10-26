@@ -33,6 +33,10 @@
       "description": "Vehicle fleet registration, specifications, and complete master details"
     },
     {
+      "name": "Company",
+      "description": "Company management (Create, Read, Update, Delete, Toggle Status)"
+    },
+    {
       "name": "Vehicle Image",
       "description": "Vehicle image gallery uploads (multipart/form-data), single/bulk images, deletion & status"
     },
@@ -136,6 +140,65 @@
           "short_name": {
             "type": "string",
             "example": "lux-suv"
+          }
+        }
+      },
+      "Company": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "company_name": {
+            "type": "string",
+            "example": "Tata Motors Ltd"
+          },
+          "company_email": {
+            "type": "string",
+            "format": "email",
+            "example": "contact@tatamotors.com"
+          },
+          "status": {
+            "type": "integer",
+            "example": 1,
+            "description": "1 for Active, 0 for Inactive (Default: 1)"
+          }
+        }
+      },
+      "CreateCompanyPayload": {
+        "type": "object",
+        "required": [
+          "company_name",
+          "company_email"
+        ],
+        "properties": {
+          "company_name": {
+            "type": "string",
+            "example": "Tata Motors Ltd",
+            "description": "Name of the company"
+          },
+          "company_email": {
+            "type": "string",
+            "format": "email",
+            "example": "contact@tatamotors.com",
+            "description": "Unique email of the company"
+          }
+        }
+      },
+      "UpdateCompanyPayload": {
+        "type": "object",
+        "properties": {
+          "company_name": {
+            "type": "string",
+            "example": "Tata Motors Updated Ltd",
+            "description": "Updated company name"
+          },
+          "company_email": {
+            "type": "string",
+            "format": "email",
+            "example": "updated@tatamotors.com",
+            "description": "Updated company email"
           }
         }
       },
@@ -1531,6 +1594,462 @@
                 "example": {
                   "success": false,
                   "message": "Vehicle not found with the provided vehicle_id"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/company/create": {
+      "post": {
+        "tags": [
+          "Company"
+        ],
+        "summary": "Create a new company",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCompanyPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Company created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "company created successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Company"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error - missing required fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "company name and email is required"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict - company already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "company already exists"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to create company",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/company/get-all": {
+      "get": {
+        "tags": [
+          "Company"
+        ],
+        "summary": "Get all companies",
+        "responses": {
+          "200": {
+            "description": "Companies fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Companies fetched successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Company"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to fetch companies",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/company/get-by-id/{id}": {
+      "get": {
+        "tags": [
+          "Company"
+        ],
+        "summary": "Get company by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Company ID",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Company fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Company fetched successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Company"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Company is inactive",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "company is not active"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Company not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Company not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to fetch company",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/company/update/{id}": {
+      "put": {
+        "tags": [
+          "Company"
+        ],
+        "summary": "Update company by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Company ID to update",
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCompanyPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Company updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Company updated successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Company"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Company is inactive",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "company is not active"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Company not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Company not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to update company",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/company/delete/{id}": {
+      "delete": {
+        "tags": [
+          "Company"
+        ],
+        "summary": "Delete company by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Company ID to delete",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Company deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardSuccessResponse"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Company deleted successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Company is inactive",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "company is not active"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Company not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Company not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to delete company",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/company/toggle-status/{id}": {
+      "put": {
+        "tags": [
+          "Company"
+        ],
+        "summary": "Toggle company status (Active 1 <-> Inactive 0)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Company ID to toggle status",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Company status updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Company status updated successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "status": {
+                          "type": "integer",
+                          "example": 0
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Company not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Company not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to toggle company status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
                 }
               }
             }
