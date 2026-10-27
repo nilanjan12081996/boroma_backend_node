@@ -1607,6 +1607,11 @@
           "Company"
         ],
         "summary": "Create a new company",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1655,6 +1660,26 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized (Token missing or invalid)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (SUPERADMIN role required)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
           "409": {
             "description": "Conflict - company already exists",
             "content": {
@@ -1688,6 +1713,11 @@
           "Company"
         ],
         "summary": "Get all companies",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Companies fetched successfully",
@@ -1715,6 +1745,26 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized (Token missing or invalid)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (SUPERADMIN role required)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Failed to fetch companies",
             "content": {
@@ -1734,6 +1784,11 @@
           "Company"
         ],
         "summary": "Get company by ID",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
@@ -1784,6 +1839,26 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized (Token missing or invalid)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (SUPERADMIN role required)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Company not found",
             "content": {
@@ -1817,6 +1892,11 @@
           "Company"
         ],
         "summary": "Update company by ID",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
@@ -1877,6 +1957,26 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized (Token missing or invalid)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (SUPERADMIN role required)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Company not found",
             "content": {
@@ -1910,6 +2010,11 @@
           "Company"
         ],
         "summary": "Delete company by ID",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
@@ -1951,6 +2056,26 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized (Token missing or invalid)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (SUPERADMIN role required)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Company not found",
             "content": {
@@ -1984,6 +2109,11 @@
           "Company"
         ],
         "summary": "Toggle company status (Active 1 <-> Inactive 0)",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
@@ -2026,6 +2156,26 @@
                       }
                     }
                   }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (Token missing or invalid)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (SUPERADMIN role required)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
                 }
               }
             }

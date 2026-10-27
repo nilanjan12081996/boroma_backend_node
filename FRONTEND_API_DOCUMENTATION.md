@@ -12,12 +12,13 @@
 2. [Dev / Testing Helper: Generate Token](#-dev--testing-helper-generate-token)
 3. [Admin APIs](#-admin-apis)
 4. [Category APIs](#-category-apis)
-5. [Vehicle Info APIs](#-vehicle-info-apis)
-6. [Vehicle Image APIs (File Uploads)](#-vehicle-image-apis-file-uploads)
-7. [Category Vehicle Mapping APIs](#-category-vehicle-mapping-apis)
-8. [Master Vehicle Listing with Details](#-master-vehicle-listing-with-details)
-9. [Frontend Integration Examples (Axios / Fetch)](#-frontend-integration-examples)
-10. [Standard Response Structures](#-standard-response-structures)
+5. [Company APIs](#-company-apis)
+6. [Vehicle Info APIs](#-vehicle-info-apis)
+7. [Vehicle Image APIs (File Uploads)](#-vehicle-image-apis-file-uploads)
+8. [Category Vehicle Mapping APIs](#-category-vehicle-mapping-apis)
+9. [Master Vehicle Listing with Details](#-master-vehicle-listing-with-details)
+10. [Frontend Integration Examples (Axios / Fetch)](#-frontend-integration-examples)
+11. [Standard Response Structures](#-standard-response-structures)
 
 ---
 
@@ -280,6 +281,144 @@ All Category endpoints require `Authorization: Bearer <token>` with `role: "SUPE
   "data": {
     "id": 1,
     "category_name": "Luxury Sedan",
+    "status": 0
+  }
+}
+```
+---
+
+## 🏢 Company APIs
+
+All Company endpoints require `Authorization: Bearer <token>` with `role: "SUPERADMIN"`.
+
+### 1. Create Company
+- **Method & URL:** `POST /api/company/create`
+- **Request Headers:**
+  - `Authorization: Bearer <token>`
+  - `Content-Type: application/json`
+- **Request Payload (JSON Body):**
+```json
+{
+  "company_name": "Tata Motors Ltd",
+  "company_email": "contact@tatamotors.com"
+}
+```
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `company_name` | String | Yes | Name of the company (min 3 characters) |
+| `company_email` | String | Yes | Valid and unique company email |
+
+- **Response Payload (201 Created):**
+```json
+{
+  "success": true,
+  "message": "company created successfully",
+  "data": {
+    "id": 1,
+    "company_name": "Tata Motors Ltd",
+    "company_email": "contact@tatamotors.com",
+    "status": 1
+  }
+}
+```
+
+---
+
+### 2. Get All Companies
+- **Method & URL:** `GET /api/company/get-all`
+- **Request Headers:** `Authorization: Bearer <token>`
+- **Response Payload (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Companies fetched successfully",
+  "data": [
+    {
+      "id": 1,
+      "company_name": "Tata Motors Ltd",
+      "company_email": "contact@tatamotors.com",
+      "status": 1
+    }
+  ]
+}
+```
+
+---
+
+### 3. Get Company by ID
+- **Method & URL:** `GET /api/company/get-by-id/:id`
+- **URL Parameter:** `id` (integer) - Example: `/api/company/get-by-id/1`
+- **Request Headers:** `Authorization: Bearer <token>`
+- **Response Payload (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Company fetched successfully",
+  "data": {
+    "id": 1,
+    "company_name": "Tata Motors Ltd",
+    "company_email": "contact@tatamotors.com",
+    "status": 1
+  }
+}
+```
+
+---
+
+### 4. Update Company
+- **Method & URL:** `PUT /api/company/update/:id`
+- **URL Parameter:** `id` (integer) - Example: `/api/company/update/1`
+- **Request Headers:**
+  - `Authorization: Bearer <token>`
+  - `Content-Type: application/json`
+- **Request Payload (JSON Body):**
+```json
+{
+  "company_name": "Tata Motors Updated Ltd",
+  "company_email": "updated@tatamotors.com"
+}
+```
+- **Response Payload (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Company updated successfully",
+  "data": {
+    "id": 1,
+    "company_name": "Tata Motors Updated Ltd",
+    "company_email": "updated@tatamotors.com",
+    "status": 1
+  }
+}
+```
+
+---
+
+### 5. Delete Company
+- **Method & URL:** `DELETE /api/company/delete/:id`
+- **URL Parameter:** `id` (integer) - Example: `/api/company/delete/1`
+- **Request Headers:** `Authorization: Bearer <token>`
+- **Response Payload (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Company deleted successfully"
+}
+```
+
+---
+
+### 6. Toggle Company Status
+- **Method & URL:** `PUT /api/company/toggle-status/:id`
+- **URL Parameter:** `id` (integer) - Example: `/api/company/toggle-status/1`
+- **Request Headers:** `Authorization: Bearer <token>`
+- **Response Payload (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Company status updated successfully",
+  "data": {
+    "id": 1,
     "status": 0
   }
 }

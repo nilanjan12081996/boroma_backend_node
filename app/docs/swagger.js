@@ -1026,6 +1026,7 @@ Uploaded images are stored on the server under \`/uploads\`. The full URL can be
       post: {
         tags: ["Company"],
         summary: "Create a new company",
+        security: [{ BearerAuth: [] }],
         requestBody: {
           required: true,
           content: {
@@ -1059,6 +1060,22 @@ Uploaded images are stored on the server under \`/uploads\`. The full URL can be
               },
             },
           },
+          401: {
+            description: "Unauthorized (Token missing or invalid)",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/StandardErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden (SUPERADMIN role required)",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/StandardErrorResponse" },
+              },
+            },
+          },
           409: {
             description: "Conflict - company already exists",
             content: {
@@ -1083,6 +1100,7 @@ Uploaded images are stored on the server under \`/uploads\`. The full URL can be
       get: {
         tags: ["Company"],
         summary: "Get all companies",
+        security: [{ BearerAuth: [] }],
         responses: {
           200: {
             description: "Companies fetched successfully",
@@ -1102,6 +1120,22 @@ Uploaded images are stored on the server under \`/uploads\`. The full URL can be
               },
             },
           },
+          401: {
+            description: "Unauthorized (Token missing or invalid)",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/StandardErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden (SUPERADMIN role required)",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/StandardErrorResponse" },
+              },
+            },
+          },
           500: {
             description: "Failed to fetch companies",
             content: {
@@ -1117,6 +1151,7 @@ Uploaded images are stored on the server under \`/uploads\`. The full URL can be
       get: {
         tags: ["Company"],
         summary: "Get company by ID",
+        security: [{ BearerAuth: [] }],
         parameters: [
           {
             name: "id",
@@ -1152,6 +1187,22 @@ Uploaded images are stored on the server under \`/uploads\`. The full URL can be
               },
             },
           },
+          401: {
+            description: "Unauthorized (Token missing or invalid)",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/StandardErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden (SUPERADMIN role required)",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/StandardErrorResponse" },
+              },
+            },
+          },
           404: {
             description: "Company not found",
             content: {
@@ -1176,6 +1227,7 @@ Uploaded images are stored on the server under \`/uploads\`. The full URL can be
       put: {
         tags: ["Company"],
         summary: "Update company by ID",
+        security: [{ BearerAuth: [] }],
         parameters: [
           {
             name: "id",
@@ -1219,6 +1271,22 @@ Uploaded images are stored on the server under \`/uploads\`. The full URL can be
               },
             },
           },
+          401: {
+            description: "Unauthorized (Token missing or invalid)",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/StandardErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden (SUPERADMIN role required)",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/StandardErrorResponse" },
+              },
+            },
+          },
           404: {
             description: "Company not found",
             content: {
@@ -1243,6 +1311,7 @@ Uploaded images are stored on the server under \`/uploads\`. The full URL can be
       delete: {
         tags: ["Company"],
         summary: "Delete company by ID",
+        security: [{ BearerAuth: [] }],
         parameters: [
           {
             name: "id",
@@ -1272,6 +1341,22 @@ Uploaded images are stored on the server under \`/uploads\`. The full URL can be
               },
             },
           },
+          401: {
+            description: "Unauthorized (Token missing or invalid)",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/StandardErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden (SUPERADMIN role required)",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/StandardErrorResponse" },
+              },
+            },
+          },
           404: {
             description: "Company not found",
             content: {
@@ -1296,6 +1381,7 @@ Uploaded images are stored on the server under \`/uploads\`. The full URL can be
       put: {
         tags: ["Company"],
         summary: "Toggle company status (Active 1 <-> Inactive 0)",
+        security: [{ BearerAuth: [] }],
         parameters: [
           {
             name: "id",
@@ -1325,6 +1411,22 @@ Uploaded images are stored on the server under \`/uploads\`. The full URL can be
                     },
                   },
                 },
+              },
+            },
+          },
+          401: {
+            description: "Unauthorized (Token missing or invalid)",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/StandardErrorResponse" },
+              },
+            },
+          },
+          403: {
+            description: "Forbidden (SUPERADMIN role required)",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/StandardErrorResponse" },
               },
             },
           },
