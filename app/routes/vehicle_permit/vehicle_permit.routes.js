@@ -2,6 +2,10 @@ const express = require("express");
 const router = express.Router();
 const vehiclePermitController = require("../../controller/vehicle_permit/vehicle_permit.controller");
 const uploadImage = require("../../utils/multer");
+const authCheck = require("../../middleware/authCheck");
+const checkRole = require("../../middleware/checkRole");
+
+router.use(authCheck, checkRole("SUPERADMIN"));
 
 // Middleware for document upload (accepts 'document', 'file', or 'document_url' fields)
 const uploadDoc = uploadImage.fields([

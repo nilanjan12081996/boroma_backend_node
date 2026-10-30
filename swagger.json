@@ -51,6 +51,14 @@
     {
       "name": "Vehicle Permit",
       "description": "Vehicle permit document management (Upload, Read, Update, Delete, Toggle Status)"
+    },
+    {
+      "name": "Vehicle Pollution",
+      "description": "Vehicle pollution certificate document management (Upload, Read, Update, Delete, Toggle Status)"
+    },
+    {
+      "name": "Vehicle Tax",
+      "description": "Vehicle road tax token document management (Upload, Read, Update, Delete, Toggle Status)"
     }
   ],
   "components": {
@@ -655,6 +663,122 @@
               "vehicle_no": {
                 "type": "string",
                 "example": "KA-01-AB-1234"
+              },
+              "no_of_seat": {
+                "type": "integer",
+                "example": 5
+              },
+              "status": {
+                "type": "integer",
+                "example": 1
+              }
+            }
+          }
+        }
+      },
+      "VehiclePollution": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "vehical_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "document_url": {
+            "type": "string",
+            "example": "1740000000000-pollution.pdf"
+          },
+          "exp_date": {
+            "type": "string",
+            "format": "date",
+            "example": "2027-12-31"
+          },
+          "status": {
+            "type": "integer",
+            "example": 1,
+            "description": "1 for Active, 0 for Inactive"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-30T08:00:00.000Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-30T08:00:00.000Z"
+          },
+          "vehicle": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "example": 1
+              },
+              "vehicle_no": {
+                "type": "string",
+                "example": "WB02AK1234"
+              },
+              "no_of_seat": {
+                "type": "integer",
+                "example": 5
+              },
+              "status": {
+                "type": "integer",
+                "example": 1
+              }
+            }
+          }
+        }
+      },
+      "VehicleTax": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "vehical_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "document_url": {
+            "type": "string",
+            "example": "1740000000000-tax.pdf"
+          },
+          "exp_date": {
+            "type": "string",
+            "format": "date",
+            "example": "2027-12-31"
+          },
+          "status": {
+            "type": "integer",
+            "example": 1,
+            "description": "1 for Active, 0 for Inactive"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-30T08:00:00.000Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-30T08:00:00.000Z"
+          },
+          "vehicle": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "example": 1
+              },
+              "vehicle_no": {
+                "type": "string",
+                "example": "WB02AK1234"
               },
               "no_of_seat": {
                 "type": "integer",
@@ -4043,6 +4167,11 @@
           "Vehicle Permit"
         ],
         "summary": "Upload / Create a vehicle permit",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "description": "Create a permit record by uploading a document (PDF, JPG, PNG) or providing a document URL.",
         "requestBody": {
           "required": true,
@@ -4174,6 +4303,11 @@
           "Vehicle Permit"
         ],
         "summary": "Get all vehicle permits",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "description": "Fetch all vehicle permits with optional filtering by vehicle ID and status. Includes vehicle info.",
         "parameters": [
           {
@@ -4247,6 +4381,11 @@
           "Vehicle Permit"
         ],
         "summary": "Get all permits for a specific vehicle",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "description": "Fetch all permits assigned to a vehicle by vehical_id.",
         "parameters": [
           {
@@ -4320,6 +4459,11 @@
           "Vehicle Permit"
         ],
         "summary": "Get vehicle permit by ID",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "description": "Fetch details of a single vehicle permit along with associated vehicle details.",
         "parameters": [
           {
@@ -4386,6 +4530,11 @@
           "Vehicle Permit"
         ],
         "summary": "Update vehicle permit",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "description": "Update permit expiry date, status, vehicle association, or upload a replacement document file.",
         "parameters": [
           {
@@ -4507,6 +4656,11 @@
           "Vehicle Permit"
         ],
         "summary": "Toggle vehicle permit status",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "description": "Switches the permit status between Active (1) and Inactive (0).",
         "parameters": [
           {
@@ -4591,6 +4745,11 @@
           "Vehicle Permit"
         ],
         "summary": "Delete vehicle permit",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "description": "Deletes the vehicle permit record and permanently removes any uploaded document file from disk.",
         "parameters": [
           {
@@ -4629,6 +4788,1362 @@
                 "example": {
                   "success": false,
                   "message": "Vehicle permit not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicle-pollution/uploadPollution": {
+      "post": {
+        "tags": [
+          "Vehicle Pollution"
+        ],
+        "summary": "Upload / Create a vehicle pollution",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Create a pollution record by uploading a document (PDF, JPG, PNG) or providing a document URL.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "vehical_id"
+                ],
+                "properties": {
+                  "vehical_id": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "ID of the vehicle"
+                  },
+                  "document": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Pollution document file (PDF/Image)"
+                  },
+                  "exp_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2027-12-31",
+                    "description": "Expiry date (YYYY-MM-DD)"
+                  },
+                  "status": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "Status (1 = Active, 0 = Inactive)"
+                  }
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "vehical_id"
+                ],
+                "properties": {
+                  "vehical_id": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "ID of the vehicle"
+                  },
+                  "document_url": {
+                    "type": "string",
+                    "example": "https://example.com/pollution_cert.pdf",
+                    "description": "URL or path to pollution document"
+                  },
+                  "exp_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2027-12-31",
+                    "description": "Expiry date (YYYY-MM-DD)"
+                  },
+                  "status": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "Status (1 = Active, 0 = Inactive)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Vehicle pollution created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicle pollution created successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/VehiclePollution"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Missing vehical_id or invalid payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "vehical_id is required"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vehicle not found with the provided vehical_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Vehicle not found with the provided vehical_id"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicle-pollution/getAllPollution": {
+      "get": {
+        "tags": [
+          "Vehicle Pollution"
+        ],
+        "summary": "Get all vehicle pollution records",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Fetch all pollution records with optional filtering by vehical_id and status. Returns associated vehicle details.",
+        "parameters": [
+          {
+            "name": "vehical_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by vehicle ID",
+            "example": 1
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            },
+            "description": "Filter by status (1 = Active, 0 = Inactive)",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of vehicle pollution records fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicle pollutions fetched successfully"
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/VehiclePollution"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicle-pollution/vehical/{vehical_id}": {
+      "get": {
+        "tags": [
+          "Vehicle Pollution"
+        ],
+        "summary": "Get pollution records for a specific vehicle",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Returns all pollution records belonging to the specified vehicle ID.",
+        "parameters": [
+          {
+            "name": "vehical_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Vehicle ID",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicle pollutions fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicle pollutions fetched successfully"
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/VehiclePollution"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No vehicle found with the provided vehical_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "No vehicle found with the provided vehical_id"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicle-pollution/get/{id}": {
+      "get": {
+        "tags": [
+          "Vehicle Pollution"
+        ],
+        "summary": "Get vehicle pollution by ID",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Fetch details of a single vehicle pollution record including vehicle details.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Pollution ID",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicle pollution fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicle pollution fetched successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/VehiclePollution"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vehicle pollution not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Vehicle pollution not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicle-pollution/update/{id}": {
+      "put": {
+        "tags": [
+          "Vehicle Pollution"
+        ],
+        "summary": "Update vehicle pollution record",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Update pollution record fields. If a new document file is uploaded, the existing local file is deleted automatically.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Pollution ID to update",
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vehical_id": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "Updated vehicle ID"
+                  },
+                  "document": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "New pollution document file to replace previous file"
+                  },
+                  "exp_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2028-12-31",
+                    "description": "Updated expiry date (YYYY-MM-DD)"
+                  },
+                  "status": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "Updated status (1 = Active, 0 = Inactive)"
+                  }
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vehical_id": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "Updated vehicle ID"
+                  },
+                  "document_url": {
+                    "type": "string",
+                    "example": "https://example.com/updated_pollution_cert.pdf",
+                    "description": "Updated URL/path for pollution document"
+                  },
+                  "exp_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2028-12-31",
+                    "description": "Updated expiry date (YYYY-MM-DD)"
+                  },
+                  "status": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "Updated status (1 = Active, 0 = Inactive)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Vehicle pollution updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicle pollution updated successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/VehiclePollution"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vehicle pollution or Vehicle not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Vehicle pollution not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicle-pollution/{id}/toggle-status": {
+      "patch": {
+        "tags": [
+          "Vehicle Pollution"
+        ],
+        "summary": "Toggle vehicle pollution status",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Toggles the status of the vehicle pollution record between Active (1) and Inactive (0).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Pollution ID to toggle",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicle pollution status updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicle pollution status updated successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "vehical_id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "status": {
+                          "type": "integer",
+                          "example": 0
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vehicle pollution not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Vehicle pollution not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicle-pollution/delete/{id}": {
+      "delete": {
+        "tags": [
+          "Vehicle Pollution"
+        ],
+        "summary": "Delete vehicle pollution record",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Permanently deletes the pollution record and removes any uploaded document file from disk.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Pollution ID to delete",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicle pollution deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardSuccessResponse"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Vehicle pollution deleted successfully"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vehicle pollution not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Vehicle pollution not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicle-tax/uploadTax": {
+      "post": {
+        "tags": [
+          "Vehicle Tax"
+        ],
+        "summary": "Upload / Create a vehicle tax",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Create a tax record by uploading a document (PDF, JPG, PNG) or providing a document URL.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "vehical_id"
+                ],
+                "properties": {
+                  "vehical_id": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "ID of the vehicle"
+                  },
+                  "document": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Tax document file (PDF/Image)"
+                  },
+                  "exp_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2027-12-31",
+                    "description": "Expiry date (YYYY-MM-DD)"
+                  },
+                  "status": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "Status (1 = Active, 0 = Inactive)"
+                  }
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "vehical_id"
+                ],
+                "properties": {
+                  "vehical_id": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "ID of the vehicle"
+                  },
+                  "document_url": {
+                    "type": "string",
+                    "example": "https://example.com/tax_token.pdf",
+                    "description": "URL or path to tax document"
+                  },
+                  "exp_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2027-12-31",
+                    "description": "Expiry date (YYYY-MM-DD)"
+                  },
+                  "status": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "Status (1 = Active, 0 = Inactive)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Vehicle tax created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicle tax created successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/VehicleTax"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Missing vehical_id or invalid payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "vehical_id is required"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vehicle not found with the provided vehical_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Vehicle not found with the provided vehical_id"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicle-tax/getAllTax": {
+      "get": {
+        "tags": [
+          "Vehicle Tax"
+        ],
+        "summary": "Get all vehicle tax records",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Fetch all tax records with optional filtering by vehical_id and status. Returns associated vehicle details.",
+        "parameters": [
+          {
+            "name": "vehical_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by vehicle ID",
+            "example": 1
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            },
+            "description": "Filter by status (1 = Active, 0 = Inactive)",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of vehicle tax records fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicle taxs fetched successfully"
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/VehicleTax"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicle-tax/vehical/{vehical_id}": {
+      "get": {
+        "tags": [
+          "Vehicle Tax"
+        ],
+        "summary": "Get tax records for a specific vehicle",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Returns all tax records belonging to the specified vehicle ID.",
+        "parameters": [
+          {
+            "name": "vehical_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Vehicle ID",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicle taxs fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicle taxs fetched successfully"
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/VehicleTax"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No vehicle found with the provided vehical_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "No vehicle found with the provided vehical_id"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicle-tax/get/{id}": {
+      "get": {
+        "tags": [
+          "Vehicle Tax"
+        ],
+        "summary": "Get vehicle tax by ID",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Fetch details of a single vehicle tax record including vehicle details.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Tax ID",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicle tax fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicle tax fetched successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/VehicleTax"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vehicle tax not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Vehicle tax not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicle-tax/update/{id}": {
+      "put": {
+        "tags": [
+          "Vehicle Tax"
+        ],
+        "summary": "Update vehicle tax record",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Update tax record fields. If a new document file is uploaded, the existing local file is deleted automatically.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Tax ID to update",
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vehical_id": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "Updated vehicle ID"
+                  },
+                  "document": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "New tax document file to replace previous file"
+                  },
+                  "exp_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2028-12-31",
+                    "description": "Updated expiry date (YYYY-MM-DD)"
+                  },
+                  "status": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "Updated status (1 = Active, 0 = Inactive)"
+                  }
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vehical_id": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "Updated vehicle ID"
+                  },
+                  "document_url": {
+                    "type": "string",
+                    "example": "https://example.com/updated_tax_token.pdf",
+                    "description": "Updated URL/path for tax document"
+                  },
+                  "exp_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2028-12-31",
+                    "description": "Updated expiry date (YYYY-MM-DD)"
+                  },
+                  "status": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "Updated status (1 = Active, 0 = Inactive)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Vehicle tax updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicle tax updated successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/VehicleTax"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vehicle tax or Vehicle not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Vehicle tax not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicle-tax/{id}/toggle-status": {
+      "patch": {
+        "tags": [
+          "Vehicle Tax"
+        ],
+        "summary": "Toggle vehicle tax status",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Toggles the status of the vehicle tax record between Active (1) and Inactive (0).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Tax ID to toggle",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicle tax status updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicle tax status updated successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "vehical_id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "status": {
+                          "type": "integer",
+                          "example": 0
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vehicle tax not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Vehicle tax not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicle-tax/delete/{id}": {
+      "delete": {
+        "tags": [
+          "Vehicle Tax"
+        ],
+        "summary": "Delete vehicle tax record",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "description": "Permanently deletes the tax record and removes any uploaded document file from disk.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Tax ID to delete",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicle tax deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardSuccessResponse"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Vehicle tax deleted successfully"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vehicle tax not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Vehicle tax not found"
                 }
               }
             }
