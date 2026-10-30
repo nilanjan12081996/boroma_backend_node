@@ -1,0 +1,365 @@
+{
+  "info": {
+    "_postman_id": "vehicle-permit-collection-v1",
+    "name": "Vehicle Permit API",
+    "description": "Collection for testing Vehicle Permit CRUD and status toggle APIs in Boroma Backend.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "permit_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "vehical_id",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Upload Permit (JSON)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"vehical_id\": {{vehical_id}},\n  \"document_url\": \"https://example.com/permits/sample_permit.pdf\",\n  \"exp_date\": \"2027-12-31\",\n  \"status\": 1\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/vehicle-permit/uploadPermit",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "vehicle-permit",
+            "uploadPermit"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "var jsonData = pm.response.json();",
+              "if (jsonData.data && jsonData.data.id) {",
+              "    pm.collectionVariables.set(\"permit_id\", jsonData.data.id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Upload Permit (File Upload)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "vehical_id",
+              "value": "{{vehical_id}}",
+              "type": "text"
+            },
+            {
+              "key": "document",
+              "type": "file",
+              "src": []
+            },
+            {
+              "key": "exp_date",
+              "value": "2027-12-31",
+              "type": "text"
+            },
+            {
+              "key": "status",
+              "value": "1",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/vehicle-permit/uploadPermit",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "vehicle-permit",
+            "uploadPermit"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Get All Permits",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/vehicle-permit/getAllPermit",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "vehicle-permit",
+            "getAllPermit"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Response is an array of permits\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.eql(true);",
+              "    pm.expect(jsonData.data).to.be.an('array');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Get All Permits Filtered (?vehical_id & ?status)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/vehicle-permit/getAllPermit?vehical_id={{vehical_id}}&status=1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "vehicle-permit",
+            "getAllPermit"
+          ],
+          "query": [
+            {
+              "key": "vehical_id",
+              "value": "{{vehical_id}}"
+            },
+            {
+              "key": "status",
+              "value": "1"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Get Permits By Vehical ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/vehicle-permit/vehical/{{vehical_id}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "vehicle-permit",
+            "vehical",
+            "{{vehical_id}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Get Permit By ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/vehicle-permit/get/{{permit_id}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "vehicle-permit",
+            "get",
+            "{{permit_id}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Update Vehicle Permit (JSON)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"exp_date\": \"2028-06-30\",\n  \"status\": 1\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/vehicle-permit/update/{{permit_id}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "vehicle-permit",
+            "update",
+            "{{permit_id}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Toggle Permit Status",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/vehicle-permit/{{permit_id}}/toggle-status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "vehicle-permit",
+            "{{permit_id}}",
+            "toggle-status"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Delete Vehicle Permit",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/vehicle-permit/delete/{{permit_id}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "vehicle-permit",
+            "delete",
+            "{{permit_id}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}
+

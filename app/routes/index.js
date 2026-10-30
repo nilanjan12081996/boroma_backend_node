@@ -9,6 +9,7 @@ const VehicleImageRoutes = require('./vehicle_image/vehicle_image.routes')
 const CategoryVehicleMapRoutes = require('./category_vehical_map/category_vehical_map.routes')
 const CompanyRoutes = require('./company/company.routes')
 const CompanyCarMapRoutes = require('./company_car_maps/company_car_maps.routes')
+const VehiclePermitRoutes = require('./vehicle_permit/vehicle_permit.routes')
 
 router.use('/category', CategoryRoutes)
 
@@ -24,5 +25,8 @@ router.use('/category-vehical-map', CategoryVehicleMapRoutes)
 
 router.use('/company', CompanyRoutes)
 router.use('/company-car-map', CompanyCarMapRoutes)
+
+router.use('/vehicle-permit', VehiclePermitRoutes)
+
 
 module.exports = router

@@ -43,6 +43,14 @@
     {
       "name": "Category Vehicle Map",
       "description": "Mapping vehicles to single or multiple categories, and master listing with relations"
+    },
+    {
+      "name": "Company Car Map",
+      "description": "Mapping vehicles to companies (Create, Read, Delete, Toggle Status, List by Company)"
+    },
+    {
+      "name": "Vehicle Permit",
+      "description": "Vehicle permit document management (Upload, Read, Update, Delete, Toggle Status)"
     }
   ],
   "components": {
@@ -386,6 +394,92 @@
           }
         }
       },
+      "CompanyCarMap": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "company_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "vehicle_id": {
+            "type": "integer",
+            "example": 2
+          },
+          "status": {
+            "type": "integer",
+            "example": 1,
+            "description": "1 for Active, 0 for Inactive"
+          },
+          "company": {
+            "$ref": "#/components/schemas/Company"
+          },
+          "vehicle": {
+            "$ref": "#/components/schemas/VehicleInfo"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateCompanyCarMapPayload": {
+        "type": "object",
+        "required": [
+          "company_id"
+        ],
+        "properties": {
+          "company_id": {
+            "type": "integer",
+            "example": 1,
+            "description": "ID of the company to map vehicles to"
+          },
+          "vehicle_id": {
+            "type": "integer",
+            "example": 2,
+            "description": "Single vehicle ID (used when mapping one vehicle)"
+          },
+          "vehicle_ids": {
+            "oneOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "example": [
+                  1,
+                  2,
+                  3
+                ],
+                "description": "Array of vehicle IDs"
+              },
+              {
+                "type": "string",
+                "example": "1,2,3",
+                "description": "Comma-separated vehicle IDs"
+              }
+            ],
+            "description": "Multiple vehicle IDs to map to the company"
+          },
+          "status": {
+            "type": "integer",
+            "example": 1,
+            "description": "Status of mapping (1: Active, 0: Inactive)"
+          },
+          "replace": {
+            "type": "boolean",
+            "example": false,
+            "description": "If true, clears previous mappings for this company before creating new ones"
+          }
+        }
+      },
       "VehicleFullDetails": {
         "type": "object",
         "properties": {
@@ -513,6 +607,64 @@
           "is_verified": {
             "type": "integer",
             "example": 1
+          }
+        }
+      },
+      "VehiclePermit": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "vehical_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "document_url": {
+            "type": "string",
+            "example": "1740000000000-permit.pdf"
+          },
+          "exp_date": {
+            "type": "string",
+            "format": "date",
+            "example": "2027-12-31"
+          },
+          "status": {
+            "type": "integer",
+            "example": 1,
+            "description": "1 for Active, 0 for Inactive"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-30T08:00:00.000Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-30T08:00:00.000Z"
+          },
+          "vehicle": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "example": 1
+              },
+              "vehicle_no": {
+                "type": "string",
+                "example": "KA-01-AB-1234"
+              },
+              "no_of_seat": {
+                "type": "integer",
+                "example": 5
+              },
+              "status": {
+                "type": "integer",
+                "example": 1
+              }
+            }
           }
         }
       }
@@ -3387,6 +3539,1102 @@
           },
           "404": {
             "description": "Vehicle not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/company-car-map/create": {
+      "post": {
+        "tags": [
+          "Company Car Map"
+        ],
+        "summary": "Create company-vehicle mapping (single or multiple vehicles)",
+        "description": "Map one or multiple vehicles to a company. Provide either `vehicle_id` (single) or `vehicle_ids` (array or comma-separated string). Optionally pass `replace: true` to clear previous mappings for this company.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCompanyCarMapPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Company-vehicle mappings created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Company‑vehicle mappings created"
+                    },
+                    "created_count": {
+                      "type": "integer",
+                      "example": 2
+                    },
+                    "missing_vehicle_ids": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      },
+                      "example": []
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CompanyCarMap"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error (missing company_id or vehicle_id)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "company_id is required"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Company not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Company not found"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict: all provided vehicles are already mapped",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "All provided vehicles are already mapped"
+                    },
+                    "already_mapped_vehicle_ids": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      },
+                      "example": [
+                        1
+                      ]
+                    },
+                    "missing_vehicle_ids": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      },
+                      "example": []
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/company-car-map/getAll": {
+      "get": {
+        "tags": [
+          "Company Car Map"
+        ],
+        "summary": "Get all company-vehicle mappings with optional filters",
+        "description": "Fetches company-vehicle mappings with associated company and vehicle relations. Supports optional filtering by `company_id`, `vehicle_id`, and `status`.",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by Company ID",
+            "example": 1
+          },
+          {
+            "name": "vehicle_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by Vehicle ID",
+            "example": 2
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by Status (1: Active, 0: Inactive)",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Mappings fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Mappings fetched"
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 5
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CompanyCarMap"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/company-car-map/company/{company_id}/vehicles": {
+      "get": {
+        "tags": [
+          "Company Car Map"
+        ],
+        "summary": "Get all vehicles mapped to a specific company",
+        "description": "Returns all mapped vehicle records for the given company_id with vehicle details included.",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Company ID",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicles for company fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicles for company fetched"
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 3
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CompanyCarMap"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/company-car-map/{id}": {
+      "get": {
+        "tags": [
+          "Company Car Map"
+        ],
+        "summary": "Get single company-vehicle mapping by ID",
+        "description": "Fetches details of a single mapping record by primary key with company and vehicle included.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Mapping ID",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Mapping fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Mapping fetched"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CompanyCarMap"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Mapping not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Mapping not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Company Car Map"
+        ],
+        "summary": "Delete company-vehicle mapping by ID",
+        "description": "Permanently removes a company-vehicle mapping entry by its ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Mapping ID",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Mapping deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardSuccessResponse"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Mapping deleted"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Mapping not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Mapping not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/company-car-map/{id}/status": {
+      "patch": {
+        "tags": [
+          "Company Car Map"
+        ],
+        "summary": "Toggle mapping status (Active 1 <-> Inactive 0)",
+        "description": "Switches the mapping status between Active (1) and Inactive (0).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Mapping ID",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Mapping status toggled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Mapping status updated"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "status": {
+                          "type": "integer",
+                          "example": 0
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Mapping not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Mapping not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicle-permit/uploadPermit": {
+      "post": {
+        "tags": [
+          "Vehicle Permit"
+        ],
+        "summary": "Upload / Create a vehicle permit",
+        "description": "Create a permit record by uploading a document (PDF, JPG, PNG) or providing a document URL.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "vehical_id"
+                ],
+                "properties": {
+                  "vehical_id": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "ID of the vehicle"
+                  },
+                  "document": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Permit file (PDF/Image)"
+                  },
+                  "exp_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2027-12-31",
+                    "description": "Expiry date (YYYY-MM-DD)"
+                  },
+                  "status": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "Status (1 = Active, 0 = Inactive)"
+                  }
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "vehical_id"
+                ],
+                "properties": {
+                  "vehical_id": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "ID of the vehicle"
+                  },
+                  "document_url": {
+                    "type": "string",
+                    "example": "https://example.com/permit.pdf",
+                    "description": "URL or path to permit document"
+                  },
+                  "exp_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2027-12-31",
+                    "description": "Expiry date (YYYY-MM-DD)"
+                  },
+                  "status": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "Status (1 = Active, 0 = Inactive)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Vehicle permit created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicle permit created successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/VehiclePermit"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Missing vehical_id or invalid payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vehicle not found with provided vehical_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicle-permit/getAllPermit": {
+      "get": {
+        "tags": [
+          "Vehicle Permit"
+        ],
+        "summary": "Get all vehicle permits",
+        "description": "Fetch all vehicle permits with optional filtering by vehicle ID and status. Includes vehicle info.",
+        "parameters": [
+          {
+            "name": "vehical_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter permits by vehicle ID",
+            "example": 1
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by status (1 = Active, 0 = Inactive)",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicle permits fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicle permits fetched successfully"
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 5
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/VehiclePermit"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicle-permit/vehical/{vehical_id}": {
+      "get": {
+        "tags": [
+          "Vehicle Permit"
+        ],
+        "summary": "Get all permits for a specific vehicle",
+        "description": "Fetch all permits assigned to a vehicle by vehical_id.",
+        "parameters": [
+          {
+            "name": "vehical_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Vehicle ID",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicle permits fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicle permits fetched successfully"
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 2
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/VehiclePermit"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No vehicle found with the provided vehical_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicle-permit/get/{id}": {
+      "get": {
+        "tags": [
+          "Vehicle Permit"
+        ],
+        "summary": "Get vehicle permit by ID",
+        "description": "Fetch details of a single vehicle permit along with associated vehicle details.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Permit ID",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicle permit fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicle permit fetched successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/VehiclePermit"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vehicle permit not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicle-permit/update/{id}": {
+      "put": {
+        "tags": [
+          "Vehicle Permit"
+        ],
+        "summary": "Update vehicle permit",
+        "description": "Update permit expiry date, status, vehicle association, or upload a replacement document file.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Permit ID to update",
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vehical_id": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "New vehicle ID"
+                  },
+                  "document": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "New document file to replace existing"
+                  },
+                  "exp_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2028-12-31"
+                  },
+                  "status": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vehical_id": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "New vehicle ID"
+                  },
+                  "document_url": {
+                    "type": "string",
+                    "example": "https://example.com/updated_permit.pdf"
+                  },
+                  "exp_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2028-12-31"
+                  },
+                  "status": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Vehicle permit updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicle permit updated successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/VehiclePermit"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vehicle permit or vehicle not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicle-permit/{id}/toggle-status": {
+      "patch": {
+        "tags": [
+          "Vehicle Permit"
+        ],
+        "summary": "Toggle vehicle permit status",
+        "description": "Switches the permit status between Active (1) and Inactive (0).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Permit ID",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicle permit status updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicle permit status updated successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "vehical_id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "status": {
+                          "type": "integer",
+                          "example": 0
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vehicle permit not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vehicle-permit/delete/{id}": {
+      "delete": {
+        "tags": [
+          "Vehicle Permit"
+        ],
+        "summary": "Delete vehicle permit",
+        "description": "Deletes the vehicle permit record and permanently removes any uploaded document file from disk.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Permit ID to delete",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicle permit deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardSuccessResponse"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Vehicle permit deleted successfully"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vehicle permit not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Vehicle permit not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
             "content": {
               "application/json": {
                 "schema": {

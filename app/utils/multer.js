@@ -11,12 +11,13 @@ const FILE_TYPE_MAP = {
     "image/jpg": "jpg",
     "image/gif": "gif",
     "image/webp": "webp",
+    "application/pdf": "pdf",
 };
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         const isValid = FILE_TYPE_MAP[file.mimetype]
-        let uploadError = new Error('invalid image type')
+        let uploadError = new Error('invalid file type')
         if (isValid) {
             uploadError = null
         }
