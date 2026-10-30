@@ -3889,6 +3889,84 @@
         }
       }
     },
+    "/api/company-car-map/available-vehicles": {
+      "get": {
+        "tags": [
+          "Company Car Map"
+        ],
+        "summary": "Get all vehicles available for company registration (unmapped vehicles)",
+        "description": "Returns all vehicles that are NOT currently registered/mapped to any company. Once a vehicle is mapped, it will not appear here until deleted.",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [0, 1]
+            },
+            "description": "Filter vehicles by status (1 = Active, 0 = Inactive)",
+            "example": 1
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search vehicle by registration number (vehicle_no)",
+            "example": "WB02"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Available vehicles fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Available vehicles for company registration fetched successfully"
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 5
+                    },
+                    "currently_mapped_count": {
+                      "type": "integer",
+                      "example": 3
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/VehicleInfo"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/company-car-map/company/{company_id}/vehicles": {
       "get": {
         "tags": [

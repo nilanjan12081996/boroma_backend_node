@@ -8,6 +8,10 @@ router.post('/create', companyCarMapController.createCompanyVehicleMap);
 // Get all mappings (supports query filters)
 router.get('/getAll', companyCarMapController.getAllCompanyVehicleMaps);
 
+// Get available vehicles for registration (NOT registered in any company)
+router.get('/available-vehicles', companyCarMapController.getAvailableVehicles);
+router.get('/unmapped-vehicles', companyCarMapController.getAvailableVehicles);
+
 // Get mappings for a specific company (vehicles list)
 router.get('/company/:company_id/vehicles', companyCarMapController.getVehiclesByCompanyId);
 
