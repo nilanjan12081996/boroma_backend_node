@@ -63,6 +63,10 @@ const swaggerDocument = {
     {
       "name": "Vehicle Tax",
       "description": "Vehicle road tax token document management (Upload, Read, Update, Delete, Toggle Status)"
+    },
+    {
+      "name": "Vehicle Fitness",
+      "description": "Vehicle fitness certificate document management (Upload, Read, Update, Delete, Toggle Status)"
     }
   ],
   "components": {
@@ -783,6 +787,64 @@ const swaggerDocument = {
               "vehicle_no": {
                 "type": "string",
                 "example": "WB02AK1234"
+              },
+              "no_of_seat": {
+                "type": "integer",
+                "example": 5
+              },
+              "status": {
+                "type": "integer",
+                "example": 1
+              }
+            }
+          }
+        }
+      },
+      "VehicleFitness": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "vehical_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "document_url": {
+            "type": "string",
+            "example": "1740000000000-fitness.pdf"
+          },
+          "exp_date": {
+            "type": "string",
+            "format": "date",
+            "example": "2027-12-31"
+          },
+          "status": {
+            "type": "integer",
+            "example": 1,
+            "description": "1 for Active, 0 for Inactive"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-31T08:00:00.000Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-10-31T08:00:00.000Z"
+          },
+          "vehicle": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "example": 1
+              },
+              "vehicle_no": {
+                "type": "string",
+                "example": "KA-01-AB-1234"
               },
               "no_of_seat": {
                 "type": "integer",
@@ -3907,7 +3969,10 @@ const swaggerDocument = {
             "required": false,
             "schema": {
               "type": "integer",
-              "enum": [0, 1]
+              "enum": [
+                0,
+                1
+              ]
             },
             "description": "Filter vehicles by status (1 = Active, 0 = Inactive)",
             "example": 1
@@ -6241,6 +6306,846 @@ const swaggerDocument = {
             }
           }
         }
+      }
+    },
+    "/api/vehicle-fitness/uploadFitness": {
+      "post": {
+        "tags": [
+          "Vehicle Fitness"
+        ],
+        "summary": "Upload / Create a vehicle fitness record",
+        "description": "Create a fitness record by uploading a document (PDF, JPG, PNG) or providing a document URL.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "vehical_id"
+                ],
+                "properties": {
+                  "vehical_id": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "ID of the vehicle"
+                  },
+                  "document": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Fitness certificate file (PDF/Image)"
+                  },
+                  "exp_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2027-12-31",
+                    "description": "Expiry date (YYYY-MM-DD)"
+                  },
+                  "status": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "Status (1 = Active, 0 = Inactive)"
+                  }
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "vehical_id"
+                ],
+                "properties": {
+                  "vehical_id": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "ID of the vehicle"
+                  },
+                  "document_url": {
+                    "type": "string",
+                    "example": "https://example.com/fitness.pdf",
+                    "description": "URL or path to fitness document"
+                  },
+                  "exp_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2027-12-31",
+                    "description": "Expiry date (YYYY-MM-DD)"
+                  },
+                  "status": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "Status (1 = Active, 0 = Inactive)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Vehicle fitness created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicle fitness created successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/VehicleFitness"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Missing vehical_id or invalid payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Token is required or invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Access Denied , Token is required"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Requires SUPERADMIN role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Access Denied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vehicle not found with provided vehical_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/vehicle-fitness/getAllFitness": {
+      "get": {
+        "tags": [
+          "Vehicle Fitness"
+        ],
+        "summary": "Get all vehicle fitness records",
+        "description": "Fetch all vehicle fitness records with optional filtering by vehicle ID and status. Includes vehicle info.",
+        "parameters": [
+          {
+            "name": "vehical_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter fitness records by vehicle ID",
+            "example": 1
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by status (1 = Active, 0 = Inactive)",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicle fitness records fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicle fitness records fetched successfully"
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 5
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/VehicleFitness"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Token is required or invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Access Denied , Token is required"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Requires SUPERADMIN role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Access Denied"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/vehicle-fitness/vehical/{vehical_id}": {
+      "get": {
+        "tags": [
+          "Vehicle Fitness"
+        ],
+        "summary": "Get all fitness records for a specific vehicle",
+        "description": "Fetch all fitness records assigned to a vehicle by vehical_id.",
+        "parameters": [
+          {
+            "name": "vehical_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Vehicle ID",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicle fitness records fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicle fitness records fetched successfully"
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 2
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/VehicleFitness"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Token is required or invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Access Denied , Token is required"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Requires SUPERADMIN role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Access Denied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No vehicle found with the provided vehical_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/vehicle-fitness/get/{id}": {
+      "get": {
+        "tags": [
+          "Vehicle Fitness"
+        ],
+        "summary": "Get vehicle fitness by ID",
+        "description": "Fetch details of a single vehicle fitness record along with associated vehicle details.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Fitness Record ID",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicle fitness fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicle fitness fetched successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/VehicleFitness"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Token is required or invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Access Denied , Token is required"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Requires SUPERADMIN role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Access Denied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vehicle fitness record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/vehicle-fitness/update/{id}": {
+      "put": {
+        "tags": [
+          "Vehicle Fitness"
+        ],
+        "summary": "Update vehicle fitness record",
+        "description": "Update fitness expiry date, status, vehicle association, or upload a replacement document file.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Fitness Record ID to update",
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vehical_id": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "New vehicle ID"
+                  },
+                  "document": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "New document file to replace existing"
+                  },
+                  "exp_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2028-12-31"
+                  },
+                  "status": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vehical_id": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "New vehicle ID"
+                  },
+                  "document_url": {
+                    "type": "string",
+                    "example": "https://example.com/updated_fitness.pdf"
+                  },
+                  "exp_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2028-12-31"
+                  },
+                  "status": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Vehicle fitness updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicle fitness updated successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/VehicleFitness"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Token is required or invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Access Denied , Token is required"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Requires SUPERADMIN role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Access Denied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vehicle fitness record or vehicle not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/vehicle-fitness/{id}/toggle-status": {
+      "patch": {
+        "tags": [
+          "Vehicle Fitness"
+        ],
+        "summary": "Toggle vehicle fitness status",
+        "description": "Switches the fitness record status between Active (1) and Inactive (0).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Fitness Record ID",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicle fitness status updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Vehicle fitness status updated successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "vehical_id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "status": {
+                          "type": "integer",
+                          "example": 0
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Token is required or invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Access Denied , Token is required"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Requires SUPERADMIN role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Access Denied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vehicle fitness record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/vehicle-fitness/delete/{id}": {
+      "delete": {
+        "tags": [
+          "Vehicle Fitness"
+        ],
+        "summary": "Delete vehicle fitness record",
+        "description": "Deletes the vehicle fitness record and permanently removes any uploaded document file from disk.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Fitness Record ID to delete",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicle fitness deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardSuccessResponse"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Vehicle fitness deleted successfully"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Token is required or invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Access Denied , Token is required"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Requires SUPERADMIN role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Access Denied"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vehicle fitness record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Vehicle fitness record not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
       }
     }
   }

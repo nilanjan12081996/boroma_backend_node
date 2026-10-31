@@ -1,0 +1,1194 @@
+{
+  "info": {
+    "name": "Boroma Fleet Management API",
+    "description": "Complete Boroma Fleet API collection with separate folders for each module.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "vehical_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "fitness_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "permit_id",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Admin & Auth",
+      "description": "Admin user listings and JWT token generator for testing",
+      "item": [
+        {
+          "name": "Get all admins (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/admin/admins"
+            }
+          }
+        },
+        {
+          "name": "Generate SUPERADMIN JWT token for testing (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": ":{baseUrl}/admin/generate-token"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"SUPERADMIN\",\n  \"email\": \"admin@boroma.com\",\n  \"id\": 1\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set('token', jsonData.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Category",
+      "description": "Vehicle category management (Create, Read, Update, Delete, Toggle Status)",
+      "item": [
+        {
+          "name": "Create a new category (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": ":{baseUrl}/category/save"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Get all categories (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/category/get"
+            }
+          }
+        },
+        {
+          "name": "Get category by ID (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/category/get/:id"
+            }
+          }
+        },
+        {
+          "name": "Update category by ID (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": ":{baseUrl}/category/update/:id"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Delete category by ID (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/category/delete/:id"
+            }
+          }
+        },
+        {
+          "name": "Toggle category status (Active 1 <-> Inactive 0) (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/category/:id/toggle-status"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vehicle Info",
+      "description": "Vehicle fleet registration, specifications, and complete master details",
+      "item": [
+        {
+          "name": "Create vehicle info (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-info/save"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Get all vehicle info list (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-info/get"
+            }
+          }
+        },
+        {
+          "name": "Get vehicle info by ID (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-info/get/:id"
+            }
+          }
+        },
+        {
+          "name": "Update vehicle info (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-info/update/:id"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Delete vehicle info (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-info/delete/:id"
+            }
+          }
+        },
+        {
+          "name": "Toggle vehicle status (Active 1 <-> Inactive 0) (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-info/toggle-status/:id"
+            }
+          }
+        },
+        {
+          "name": "Master Listing API: Get all vehicles with categories & images (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-info/details"
+            }
+          }
+        },
+        {
+          "name": "Get complete details for a single vehicle by ID (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-info/details/:id"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Company",
+      "description": "Company management (Create, Read, Update, Delete, Toggle Status)",
+      "item": [
+        {
+          "name": "Create a new company (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": ":{baseUrl}/company/create"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Get all companies (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/company/get-all"
+            }
+          }
+        },
+        {
+          "name": "Get company by ID (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/company/get-by-id/:id"
+            }
+          }
+        },
+        {
+          "name": "Update company by ID (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": ":{baseUrl}/company/update/:id"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Delete company by ID (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/company/delete/:id"
+            }
+          }
+        },
+        {
+          "name": "Toggle company status (Active 1 <-> Inactive 0) (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/company/toggle-status/:id"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vehicle Image",
+      "description": "Vehicle image gallery uploads (multipart/form-data), single/bulk images, deletion & status",
+      "item": [
+        {
+          "name": "Upload vehicle images (Single or Multiple) (POST)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-image/save"
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "vehicle_id",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "images",
+                  "value": "",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get all vehicle images (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-image/get"
+            }
+          }
+        },
+        {
+          "name": "Get images for a specific vehicle (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-image/vehicle/:vehicle_id"
+            }
+          }
+        },
+        {
+          "name": "Get single vehicle image by record ID (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-image/get/:id"
+            }
+          }
+        },
+        {
+          "name": "Update vehicle image record (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-image/update/:id"
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "vehicle_id",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "status",
+                  "value": "1",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete vehicle image (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-image/delete/:id"
+            }
+          }
+        },
+        {
+          "name": "Toggle vehicle image status (1 <-> 0) (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-image/:id/toggle-status"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Category Vehicle Map",
+      "description": "Mapping vehicles to single or multiple categories, and master listing with relations",
+      "item": [
+        {
+          "name": "Map vehicle to single or multiple categories (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": ":{baseUrl}/category-vehicle-map/save"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Get all category-vehicle mappings (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/category-vehicle-map/get"
+            }
+          }
+        },
+        {
+          "name": "Get single mapping by ID (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/category-vehicle-map/get/:id"
+            }
+          }
+        },
+        {
+          "name": "Get all categories mapped to a specific vehicle (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/category-vehicle-map/vehicle/:vehicle_id"
+            }
+          }
+        },
+        {
+          "name": "Get all vehicles mapped to a specific category (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/category-vehicle-map/category/:category_id"
+            }
+          }
+        },
+        {
+          "name": "Delete a single mapping by ID (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/category-vehicle-map/delete/:id"
+            }
+          }
+        },
+        {
+          "name": "Remove categories from a vehicle (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": ":{baseUrl}/category-vehicle-map/vehicle/:vehicle_id/remove"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Toggle mapping status (1 <-> 0) (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/category-vehicle-map/:id/toggle-status"
+            }
+          }
+        },
+        {
+          "name": "Master Listing API: All vehicles with categories and full image URLs (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/category-vehicle-map/vehicle-details"
+            }
+          }
+        },
+        {
+          "name": "Master Details API: Single vehicle full details (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/category-vehicle-map/vehicle-details/:vehicle_id"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Company Car Map",
+      "description": "Mapping vehicles to companies (Create, Read, Delete, Toggle Status, List by Company)",
+      "item": [
+        {
+          "name": "Create company-vehicle mapping (single or multiple vehicles) (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": ":{baseUrl}/company-car-map/create"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Get all company-vehicle mappings with optional filters (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/company-car-map/getAll"
+            }
+          }
+        },
+        {
+          "name": "Get all vehicles available for company registration (unmapped vehicles) (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/company-car-map/available-vehicles"
+            }
+          }
+        },
+        {
+          "name": "Get all vehicles mapped to a specific company (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/company-car-map/company/:company_id/vehicles"
+            }
+          }
+        },
+        {
+          "name": "Get single company-vehicle mapping by ID (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/company-car-map/:id"
+            }
+          }
+        },
+        {
+          "name": "Delete company-vehicle mapping by ID (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/company-car-map/:id"
+            }
+          }
+        },
+        {
+          "name": "Toggle mapping status (Active 1 <-> Inactive 0) (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/company-car-map/:id/status"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vehicle Permit",
+      "description": "Vehicle permit document management (Upload, Read, Update, Delete, Toggle Status)",
+      "item": [
+        {
+          "name": "Upload / Create a vehicle permit (POST)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-permit/uploadPermit"
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "vehical_id",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "document",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "exp_date",
+                  "value": "2027-12-31",
+                  "type": "text"
+                },
+                {
+                  "key": "status",
+                  "value": "1",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get all vehicle permits (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-permit/getAllPermit"
+            }
+          }
+        },
+        {
+          "name": "Get all permits for a specific vehicle (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-permit/vehical/:vehical_id"
+            }
+          }
+        },
+        {
+          "name": "Get vehicle permit by ID (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-permit/get/:id"
+            }
+          }
+        },
+        {
+          "name": "Update vehicle permit (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-permit/update/:id"
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "vehical_id",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "document",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "exp_date",
+                  "value": "2028-12-31",
+                  "type": "text"
+                },
+                {
+                  "key": "status",
+                  "value": "1",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Toggle vehicle permit status (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-permit/:id/toggle-status"
+            }
+          }
+        },
+        {
+          "name": "Delete vehicle permit (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-permit/delete/:id"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vehicle Pollution",
+      "description": "Vehicle pollution certificate document management (Upload, Read, Update, Delete, Toggle Status)",
+      "item": [
+        {
+          "name": "Upload / Create a vehicle pollution (POST)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-pollution/uploadPollution"
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "vehical_id",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "document",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "exp_date",
+                  "value": "2027-12-31",
+                  "type": "text"
+                },
+                {
+                  "key": "status",
+                  "value": "1",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get all vehicle pollution records (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-pollution/getAllPollution"
+            }
+          }
+        },
+        {
+          "name": "Get pollution records for a specific vehicle (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-pollution/vehical/:vehical_id"
+            }
+          }
+        },
+        {
+          "name": "Get vehicle pollution by ID (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-pollution/get/:id"
+            }
+          }
+        },
+        {
+          "name": "Update vehicle pollution record (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-pollution/update/:id"
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "vehical_id",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "document",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "exp_date",
+                  "value": "2028-12-31",
+                  "type": "text"
+                },
+                {
+                  "key": "status",
+                  "value": "1",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Toggle vehicle pollution status (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-pollution/:id/toggle-status"
+            }
+          }
+        },
+        {
+          "name": "Delete vehicle pollution record (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-pollution/delete/:id"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vehicle Tax",
+      "description": "Vehicle road tax token document management (Upload, Read, Update, Delete, Toggle Status)",
+      "item": [
+        {
+          "name": "Upload / Create a vehicle tax (POST)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-tax/uploadTax"
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "vehical_id",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "document",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "exp_date",
+                  "value": "2027-12-31",
+                  "type": "text"
+                },
+                {
+                  "key": "status",
+                  "value": "1",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get all vehicle tax records (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-tax/getAllTax"
+            }
+          }
+        },
+        {
+          "name": "Get tax records for a specific vehicle (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-tax/vehical/:vehical_id"
+            }
+          }
+        },
+        {
+          "name": "Get vehicle tax by ID (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-tax/get/:id"
+            }
+          }
+        },
+        {
+          "name": "Update vehicle tax record (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-tax/update/:id"
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "vehical_id",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "document",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "exp_date",
+                  "value": "2028-12-31",
+                  "type": "text"
+                },
+                {
+                  "key": "status",
+                  "value": "1",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Toggle vehicle tax status (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-tax/:id/toggle-status"
+            }
+          }
+        },
+        {
+          "name": "Delete vehicle tax record (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-tax/delete/:id"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vehicle Fitness",
+      "description": "Vehicle fitness certificate document management (Upload, Read, Update, Delete, Toggle Status)",
+      "item": [
+        {
+          "name": "Upload / Create a vehicle fitness record (POST)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-fitness/uploadFitness"
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "vehical_id",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "document",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "exp_date",
+                  "value": "2027-12-31",
+                  "type": "text"
+                },
+                {
+                  "key": "status",
+                  "value": "1",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get all vehicle fitness records (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-fitness/getAllFitness"
+            }
+          }
+        },
+        {
+          "name": "Get all fitness records for a specific vehicle (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-fitness/vehical/:vehical_id"
+            }
+          }
+        },
+        {
+          "name": "Get vehicle fitness by ID (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-fitness/get/:id"
+            }
+          }
+        },
+        {
+          "name": "Update vehicle fitness record (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-fitness/update/:id"
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "vehical_id",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "document",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "exp_date",
+                  "value": "2028-12-31",
+                  "type": "text"
+                },
+                {
+                  "key": "status",
+                  "value": "1",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Toggle vehicle fitness status (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-fitness/:id/toggle-status"
+            }
+          }
+        },
+        {
+          "name": "Delete vehicle fitness record (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/vehicle-fitness/delete/:id"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
