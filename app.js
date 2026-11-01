@@ -5,6 +5,7 @@ const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./app/docs/swagger");
 const routes = require("./app/routes");
+const { registerCronJobs } = require("./app/cron/cronScheduler");
 
 const app = express();
 app.use(cors());
@@ -53,6 +54,9 @@ const PORT = process.env.PORT || 5000;
 const startServer = async () => {
   await connectDB();
 
+  // Register all cron jobs after DB connection is established
+  registerCronJobs();
+
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`Swagger documentation: http://localhost:${PORT}/api-docs`);
@@ -60,4 +64,4 @@ const startServer = async () => {
   });
 };
 
-startServer();
+startServer();
