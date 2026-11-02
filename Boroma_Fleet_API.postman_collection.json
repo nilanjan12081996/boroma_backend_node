@@ -29,6 +29,11 @@
       "key": "permit_id",
       "value": "1",
       "type": "string"
+    },
+    {
+      "key": "driver_id",
+      "value": "1",
+      "type": "string"
     }
   ],
   "auth": {
@@ -715,11 +720,6 @@
                   "key": "exp_date",
                   "value": "2027-12-31",
                   "type": "text"
-                },
-                {
-                  "key": "status",
-                  "value": "1",
-                  "type": "text"
                 }
               ]
             }
@@ -1093,11 +1093,6 @@
                   "key": "exp_date",
                   "value": "2027-12-31",
                   "type": "text"
-                },
-                {
-                  "key": "status",
-                  "value": "1",
-                  "type": "text"
                 }
               ]
             }
@@ -1185,6 +1180,90 @@
             "header": [],
             "url": {
               "raw": ":{baseUrl}/vehicle-fitness/delete/:id"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Driver",
+      "description": "Driver management (Registration, Read, Update, Delete, Toggle Status)",
+      "item": [
+        {
+          "name": "Get all drivers (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/driver/getAll"
+            }
+          }
+        },
+        {
+          "name": "Get driver by ID (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/driver/get/:id"
+            }
+          }
+        },
+        {
+          "name": "Update driver details (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": ":{baseUrl}/driver/update/:id"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Toggle driver status (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/driver/:id/toggle-status"
+            }
+          }
+        },
+        {
+          "name": "Delete driver (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": ":{baseUrl}/driver/delete/:id"
+            }
+          }
+        },
+        {
+          "name": "Register a new driver (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": ":{baseUrl}/driver/register"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
             }
           }
         }

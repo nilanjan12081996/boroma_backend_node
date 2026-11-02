@@ -13,6 +13,7 @@ const VehiclePermitRoutes = require('./vehicle_permit/vehicle_permit.routes')
 const VehiclePollutionRoutes = require('./vehicle_pollution/vehicle_pollution.routes')
 const VehicleTaxRoutes = require('./vehicle_tax/vehicle_tax.routes')
 const VehicleFitnessRoutes = require('./vehicle_fitness/vehicle_fitness.routes')
+const DriverRoutes = require('./driver/driver.routes')
 
 router.use('/category', CategoryRoutes)
 
@@ -40,5 +41,8 @@ router.use('/vehical-tax', VehicleTaxRoutes)
 
 router.use('/vehicle-fitness', VehicleFitnessRoutes)
 router.use('/vehical-fitness', VehicleFitnessRoutes)
+
+router.use('/driver', DriverRoutes)
+router.use('/drivers', DriverRoutes)
 
 module.exports = router
