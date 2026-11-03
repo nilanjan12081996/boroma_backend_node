@@ -22,7 +22,7 @@ const formatVehicleDetails = (vehicle, req) => {
 
   const formattedCategories = (json.categories || []).map((cat) => ({
     id: cat.id,
-    category_name: cat.category_name,
+    [cat.short_name || "category_name"]: cat.category_name,
     short_name: cat.short_name,
     status: cat.status,
     mapping_id: cat.CategoryVehicalMap ? cat.CategoryVehicalMap.id : null,
