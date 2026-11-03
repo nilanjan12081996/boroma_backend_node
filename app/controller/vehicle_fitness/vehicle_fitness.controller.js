@@ -36,7 +36,7 @@ exports.createVehicleFitness = async (req, res) => {
 
   try {
     const vehical_id = req.body.vehical_id || req.body.vehicle_id;
-    const { exp_date, status, document_url: bodyDocUrl } = req.body;
+    const { exp_date, document_url: bodyDocUrl } = req.body;
 
     if (!vehical_id) {
       deleteUploadedFile(uploadedFile);
@@ -68,7 +68,7 @@ exports.createVehicleFitness = async (req, res) => {
       vehical_id,
       document_url: finalDocUrl,
       exp_date: exp_date || null,
-      status: status !== undefined ? Number(status) : 1,
+      status: req.body.status !== undefined ? Number(req.body.status) : 1, // Automatically set to 1 (Active) without needing status from frontend
       created_at: new Date(),
       updated_at: new Date(),
     });

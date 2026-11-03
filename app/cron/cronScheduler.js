@@ -1,33 +1,42 @@
-const cron = require("node-cron");
-const { checkDocumentExpiriesAndNotify } = require("../jobs/documentExpiryChecker.job");
 
-/**
- * Registers all application cron jobs.
- *
- * Schedule: "0 *\/12 * * *"
- *   → Runs at minute 0 of every 12th hour (i.e., 00:00 and 12:00 every day)
- *
- * Timezone: Asia/Kolkata (IST) — change as needed
- */
+const cron = require("node-cron");
+
+const {
+  checkDocumentExpiriesAndNotify
+} = require("../jobs/documentExpiryChecker.job");
+
+// Runs at 12:00 AM and 12:00 PM every day (IST)
 const registerCronJobs = () => {
-  // ─── Document Expiry Alert Job ─────────────────────────────────────────────
+  const expression = "0 */12 * * *";
+
+  if (!cron.validate(expression)) {
+    throw new Error(`Invalid cron expression: ${expression}`);
+  }
+
   cron.schedule(
-    "0 */12 * * *",
+    expression,
     async () => {
       try {
+        console.log("[CronScheduler] Document expiry job started");
+
         await checkDocumentExpiriesAndNotify();
+
+        console.log("[CronScheduler] Document expiry job completed");
       } catch (err) {
-        console.error("[CronScheduler] Unhandled error in documentExpiry job:", err.message);
+        console.error(
+          "[CronScheduler] Document expiry job error:",
+          err.message
+        );
       }
     },
     {
-      scheduled: true,
-      timezone: "Asia/Kolkata",
+      timezone: "Asia/Kolkata"
     }
   );
 
-  console.log("[CronScheduler] ✅ Document Expiry Alert job registered — runs every 12 hours.");
+  console.log(
+    "[CronScheduler] Document Expiry Alert job registered successfully."
+  );
 };
 
 module.exports = { registerCronJobs };
-

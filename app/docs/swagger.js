@@ -67,6 +67,10 @@ const swaggerDocument = {
     {
       "name": "Vehicle Fitness",
       "description": "Vehicle fitness certificate document management (Upload, Read, Update, Delete, Toggle Status)"
+    },
+    {
+      "name": "Driver",
+      "description": "Driver management (Registration, Read, Update, Delete, Toggle Status)"
     }
   ],
   "components": {
@@ -855,6 +859,97 @@ const swaggerDocument = {
                 "example": 1
               }
             }
+          }
+        }
+      },
+      "Driver": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "driver_name": {
+            "type": "string",
+            "example": "Rajesh Kumar"
+          },
+          "driver_phone": {
+            "type": "string",
+            "example": "9876543210"
+          },
+          "driver_email": {
+            "type": "string",
+            "example": "rajesh@boroma.com"
+          },
+          "status": {
+            "type": "integer",
+            "example": 0,
+            "description": "0 for Inactive/Pending, 1 for Active"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-11-02T08:00:00.000Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-11-02T08:00:00.000Z"
+          }
+        }
+      },
+      "CreateDriverPayload": {
+        "type": "object",
+        "required": [
+          "driver_name",
+          "driver_phone"
+        ],
+        "properties": {
+          "driver_name": {
+            "type": "string",
+            "example": "Rajesh Kumar",
+            "description": "Driver full name"
+          },
+          "driver_phone": {
+            "type": "string",
+            "example": "9876543210",
+            "description": "Unique mobile phone number"
+          },
+          "driver_email": {
+            "type": "string",
+            "example": "rajesh@boroma.com",
+            "description": "Optional unique email"
+          },
+          "password": {
+            "type": "string",
+            "example": "Pass@123",
+            "description": "Optional: If omitted, a random 8-character password with upper, lower, numbers, and special chars (@#$!%*?&) will be auto-generated"
+          }
+        }
+      },
+      "UpdateDriverPayload": {
+        "type": "object",
+        "properties": {
+          "driver_name": {
+            "type": "string",
+            "example": "Rajesh Kumar"
+          },
+          "driver_phone": {
+            "type": "string",
+            "example": "9876543210"
+          },
+          "driver_email": {
+            "type": "string",
+            "example": "rajesh.updated@boroma.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "NewSecret@123"
+          },
+          "status": {
+            "type": "integer",
+            "example": 1,
+            "description": "1 for Active, 0 for Inactive"
           }
         }
       }
@@ -4345,11 +4440,6 @@ const swaggerDocument = {
                     "format": "date",
                     "example": "2027-12-31",
                     "description": "Expiry date (YYYY-MM-DD)"
-                  },
-                  "status": {
-                    "type": "integer",
-                    "example": 1,
-                    "description": "Status (1 = Active, 0 = Inactive)"
                   }
                 }
               }
@@ -4376,11 +4466,6 @@ const swaggerDocument = {
                     "format": "date",
                     "example": "2027-12-31",
                     "description": "Expiry date (YYYY-MM-DD)"
-                  },
-                  "status": {
-                    "type": "integer",
-                    "example": 1,
-                    "description": "Status (1 = Active, 0 = Inactive)"
                   }
                 }
               }
@@ -6340,11 +6425,6 @@ const swaggerDocument = {
                     "format": "date",
                     "example": "2027-12-31",
                     "description": "Expiry date (YYYY-MM-DD)"
-                  },
-                  "status": {
-                    "type": "integer",
-                    "example": 1,
-                    "description": "Status (1 = Active, 0 = Inactive)"
                   }
                 }
               }
@@ -6371,11 +6451,6 @@ const swaggerDocument = {
                     "format": "date",
                     "example": "2027-12-31",
                     "description": "Expiry date (YYYY-MM-DD)"
-                  },
-                  "status": {
-                    "type": "integer",
-                    "example": 1,
-                    "description": "Status (1 = Active, 0 = Inactive)"
                   }
                 }
               }
@@ -7146,6 +7221,585 @@ const swaggerDocument = {
             "BearerAuth": []
           }
         ]
+      }
+    },
+    "/api/driver/getAll": {
+      "get": {
+        "tags": [
+          "Driver"
+        ],
+        "summary": "Get all drivers",
+        "description": "Fetch all registered drivers with optional filtering by status and search keyword (name/phone/email).",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by status (1 = Active, 0 = Inactive)",
+            "example": 1
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search by driver name, phone, or email",
+            "example": "Rajesh"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Drivers fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Drivers fetched successfully"
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 10
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Driver"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/driver/get/{id}": {
+      "get": {
+        "tags": [
+          "Driver"
+        ],
+        "summary": "Get driver by ID",
+        "description": "Fetch complete details for a single driver by their driver ID.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Driver ID",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Driver fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Driver fetched successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Driver"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Driver not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/driver/update/{id}": {
+      "put": {
+        "tags": [
+          "Driver"
+        ],
+        "summary": "Update driver details",
+        "description": "Updates driver name, phone, email, password, or status.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Driver ID to update",
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDriverPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Driver updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Driver updated successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Driver"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Driver not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Phone or email already used by another driver",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/driver/{id}/toggle-status": {
+      "patch": {
+        "tags": [
+          "Driver"
+        ],
+        "summary": "Toggle driver status",
+        "description": "Switches driver status between Active (1) and Inactive (0).",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Driver ID",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Driver status updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Driver status updated successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "driver_name": {
+                          "type": "string",
+                          "example": "Rajesh Kumar"
+                        },
+                        "status": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Driver not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/driver/delete/{id}": {
+      "delete": {
+        "tags": [
+          "Driver"
+        ],
+        "summary": "Delete driver",
+        "description": "Deletes a driver record permanently.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Driver ID to delete",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Driver deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardSuccessResponse"
+                },
+                "example": {
+                  "success": true,
+                  "message": "Driver deleted successfully"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Driver not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Driver not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/driver/register": {
+      "post": {
+        "tags": [
+          "Driver"
+        ],
+        "summary": "Register a new driver",
+        "description": "Registers a new driver. If password is not provided in payload, a strong 8-character password (with uppercase, lowercase, numbers, and special characters) is automatically generated.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDriverPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Driver registered successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Driver created successfully"
+                    },
+                    "generated_password": {
+                      "type": "string",
+                      "example": "U@4Mvuo9",
+                      "description": "Returned only if password was auto-generated"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Driver"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Driver created successfully",
+                  "generated_password": "U@4Mvuo9",
+                  "data": {
+                    "id": 1,
+                    "driver_name": "Rajesh Kumar",
+                    "driver_phone": "9876543210",
+                    "driver_email": "rajesh@boroma.com",
+                    "status": 0,
+                    "created_at": "2026-11-02T08:00:00.000Z",
+                    "updated_at": "2026-11-02T08:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Missing driver_name or driver_phone",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "driver_name and driver_phone are required"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing or invalid JWT token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Access Denied , Token is required"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Requires SUPERADMIN role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Access Denied"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict - Driver phone or email already registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "message": "Driver with this phone number already exists"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
