@@ -1,4 +1,120 @@
+const { Op } = require("sequelize");
 const Category = require("../../models/category.model");
+
+// 1. Transport Type Dropdown (e.g. "bus", "car")
+exports.getTransportTypes = async (req, res) => {
+  try {
+    const transportTypes = ["bus", "car"]; // Transport type short names
+    const data = await Category.findAll({
+      where: {
+        short_name: {
+          [Op.in]: transportTypes,
+        },
+        status: 1, // Dropdown er jonno shudhu active items
+      },
+      attributes: ["id", "category_name", "short_name"],
+      order: [["category_name", "ASC"]],
+    });
+    return res.status(200).json({
+      success: true,
+      message: "Transport types fetched successfully",
+      data,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch transport types",
+      error: error.message,
+    });
+  }
+};
+// 2. Car Type Dropdown
+exports.getCarTypes = async (req, res) => {
+  try {
+    // Ekhane apnar car type er short_name gulo bosaben
+    const carTypes = ["sedan", "suv", "prem-sed", "prem-suv"];
+    const data = await Category.findAll({
+      where: {
+        short_name: {
+          [Op.in]: carTypes,
+        },
+        status: 1,
+      },
+      attributes: ["id", "category_name", "short_name"],
+      order: [["category_name", "ASC"]],
+    });
+    return res.status(200).json({
+      success: true,
+      message: "Car types fetched successfully",
+      data,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch car types",
+      error: error.message,
+    });
+  }
+};
+// 3. Bus Type Dropdown
+exports.getBusTypes = async (req, res) => {
+  try {
+    // Ekhane apnar bus type er short_name gulo bosaben
+    const busTypes = ["10-15 seater", "15-17 seater", "17-26 seater", "26-33 seater", "33-41 seater", "41-55 seater"];
+    const data = await Category.findAll({
+      where: {
+        short_name: {
+          [Op.in]: busTypes,
+        },
+        status: 1,
+      },
+      attributes: ["id", "category_name", "short_name"],
+      order: [["category_name", "ASC"]],
+    });
+    return res.status(200).json({
+      success: true,
+      message: "Bus types fetched successfully",
+      data,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch bus types",
+      error: error.message,
+    });
+  }
+};
+// 4. Fuel Type Dropdown
+exports.getFuelTypes = async (req, res) => {
+  try {
+    // Ekhane apnar fuel type er short_name gulo bosaben
+    const fuelTypes = ["petrol", "diesel", "cng", "ev"];
+    const data = await Category.findAll({
+      where: {
+        short_name: {
+          [Op.in]: fuelTypes,
+        },
+        status: 1,
+      },
+      attributes: ["id", "category_name", "short_name"],
+      order: [["category_name", "ASC"]],
+    });
+    return res.status(200).json({
+      success: true,
+      message: "Fuel types fetched successfully",
+      data,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch fuel types",
+      error: error.message,
+    });
+  }
+};
+
+
+
 
 exports.createCategory = async (req, res) => {
   try {
@@ -25,7 +141,7 @@ exports.createCategory = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to create category",
-      
+
     });
   }
 };

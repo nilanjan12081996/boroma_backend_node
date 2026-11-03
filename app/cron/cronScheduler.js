@@ -12,7 +12,7 @@ const { checkDocumentExpiriesAndNotify } = require("../jobs/documentExpiryChecke
 const registerCronJobs = () => {
   // ─── Document Expiry Alert Job ─────────────────────────────────────────────
   cron.schedule(
-    "*0 */12 * * *",
+    "0 */12 * * *",
     async () => {
       try {
         await checkDocumentExpiriesAndNotify();

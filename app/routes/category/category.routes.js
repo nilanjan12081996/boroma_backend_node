@@ -19,4 +19,12 @@ router.delete("/delete/:id", categoryController.deleteCategory);
 
 router.patch("/:id/toggle-status", categoryController.toggleCategory);
 
+
+
+//  all types of category for dropdown 
+router.get("/transport-types", categoryController.getTransportTypes)
+router.get("/car-types", categoryController.getCarTypes);
+router.get("/bus-types", categoryController.getBusTypes);
+router.get("/fuel-types", categoryController.getFuelTypes);
+
 module.exports = router;

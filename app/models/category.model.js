@@ -13,11 +13,13 @@ const Category = sequelize.define(
     category_name: {
       type: DataTypes.STRING,
     },
+
     short_name: {
       type: DataTypes.STRING,
     },
     status: {
       type: DataTypes.TINYINT,
+      defaultValue: 1,
     },
   },
   {
