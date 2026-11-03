@@ -26,5 +26,7 @@ router.get("/transport-types", categoryController.getTransportTypes)
 router.get("/car-types", categoryController.getCarTypes);
 router.get("/bus-types", categoryController.getBusTypes);
 router.get("/fuel-types", categoryController.getFuelTypes);
+router.get("/bus-model", categoryController.getBusModel);
+router.get("/car-model", categoryController.getCarModel);
 
 module.exports = router;

@@ -113,6 +113,60 @@ exports.getFuelTypes = async (req, res) => {
   }
 };
 
+//5. Bus Model
+exports.getBusModel = async (req, res) => {
+  try {
+    const busModels = ["bharat-benz", "royal-cruiser"];
+    const data = await Category.findAll({
+      where: {
+        short_name: {
+          [Op.in]: busModels,
+        },
+        status: 1, // Dropdown er jonno shudhu active items
+      },
+      attributes: ["id", "category_name", "short_name"],
+      order: [["category_name", "ASC"]],
+    });
+    return res.status(200).json({
+      success: true,
+      message: "Bus models fetched successfully",
+      data,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch bus models",
+      error: error.message,
+    });
+  }
+}
+//6. Car Model
+exports.getCarModel = async (req, res) => {
+  try {
+    const carModels = ["swift", "dzire", "wagon-r", "innova"];
+    const data = await Category.findAll({
+      where: {
+        short_name: {
+          [Op.in]: carModels,
+        },
+        status: 1, // Dropdown er jonno shudhu active items
+      },
+      attributes: ["id", "category_name", "short_name"],
+      order: [["category_name", "ASC"]],
+    });
+    return res.status(200).json({
+      success: true,
+      message: "Car models fetched successfully",
+      data,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch car models",
+      error: error.message,
+    });
+  }
+}
 
 
 
