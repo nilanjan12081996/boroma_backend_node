@@ -12,14 +12,17 @@ const mappingController = require("../../controller/category_vehical_map/categor
 router.post("/save", vehicleInfoController.createVehicleInfo);
 
 // Get complete details of vehicles (includes categories + images)
+router.get("/vehicle-details", mappingController.getAllVehiclesFullDetails);
+router.get("/vehicle-details/:vehicle_id", mappingController.getVehicleFullDetails);
 router.get("/details", mappingController.getAllVehiclesFullDetails);
 router.get("/details/:id", mappingController.getVehicleFullDetails);
 
 // Get all vehicle info
-router.get("/get", vehicleInfoController.getAllVehicleInfo);
+router.get("/get", mappingController.getAllVehiclesFullDetails);
 
 // Get vehicle info by ID
-router.get("/get/:id", vehicleInfoController.getVehicleInfoById);
+router.get("/get/:id", mappingController.getVehicleFullDetails);
+router.get("/getAll", mappingController.getAllVehiclesFullDetails);
 
 // Update vehicle info
 router.put("/update/:id", vehicleInfoController.updateVehicleInfo);

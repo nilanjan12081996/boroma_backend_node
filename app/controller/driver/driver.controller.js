@@ -9,24 +9,37 @@ function generateRandomPassword() {
   const lower = "abcdefghijklmnopqrstuvwxyz";
   const numbers = "0123456789";
   const special = "@#$!%*?&";
-  
+
   let password = "";
   password += upper[Math.floor(Math.random() * upper.length)];
   password += special[Math.floor(Math.random() * special.length)];
   password += numbers[Math.floor(Math.random() * numbers.length)];
-  
+
   const allChars = upper + lower + numbers + special;
   for (let i = 3; i < 8; i++) {
     password += allChars[Math.floor(Math.random() * allChars.length)];
   }
-  
-  return password.split('').sort(() => 0.5 - Math.random()).join('');
+
+  return password
+    .split("")
+    .sort(() => 0.5 - Math.random())
+    .join("");
 }
 
 // 1. Create / Register Driver
 exports.createDriver = async (req, res) => {
   try {
-    const { driver_name, driver_phone, driver_email, password } = req.body;
+    const driver_name = (req.body.driver_name || req.body.name || "").trim();
+    const driver_phone = (
+      req.body.driver_phone ||
+      req.body.phone ||
+      req.body.phone_number ||
+      ""
+    ).trim();
+    const driver_email = (req.body.driver_email || req.body.email || "").trim() || null;
+    const password = req.body.password;
+    const status =
+      req.body.status !== undefined ? Number(req.body.status) : 1; // Default 1 (Active)
 
     if (!driver_name || !driver_phone) {
       return res.status(400).json({
@@ -63,7 +76,7 @@ exports.createDriver = async (req, res) => {
       driver_phone,
       driver_email: driver_email || null,
       password: hashedPassword,
-      status: 0, // Default 0 as requested
+      status: status !== undefined ? status : 1,
       created_at: new Date(),
       updated_at: new Date(),
     });
@@ -89,18 +102,22 @@ exports.createDriver = async (req, res) => {
   }
 };
 
-// 2. Get All Drivers
+// 2. Get All Drivers (?status=...&search=...)
 exports.getAllDrivers = async (req, res) => {
   try {
     const { status, search } = req.query;
     const filter = {};
 
-    if (status !== undefined) filter.status = Number(status);
-    if (search) {
+    if (status !== undefined && status !== "" && status !== "all") {
+      filter.status = Number(status);
+    }
+
+    if (search && search.trim()) {
+      const term = `%${search.trim()}%`;
       filter[Op.or] = [
-        { driver_name: { [Op.like]: `%${search}%` } },
-        { driver_phone: { [Op.like]: `%${search}%` } },
-        { driver_email: { [Op.like]: `%${search}%` } },
+        { driver_name: { [Op.like]: term } },
+        { driver_phone: { [Op.like]: term } },
+        { driver_email: { [Op.like]: term } },
       ];
     }
 
@@ -160,7 +177,11 @@ exports.getDriverById = async (req, res) => {
 exports.updateDriver = async (req, res) => {
   try {
     const { id } = req.params;
-    const { driver_name, driver_phone, driver_email, password, status } = req.body;
+    const driver_name = req.body.driver_name || req.body.name;
+    const driver_phone = req.body.driver_phone || req.body.phone || req.body.phone_number;
+    const driver_email = req.body.driver_email || req.body.email;
+    const status = req.body.status;
+    const password = req.body.password;
 
     const driver = await Driver.findByPk(id);
     if (!driver) {
@@ -171,8 +192,10 @@ exports.updateDriver = async (req, res) => {
     }
 
     // Check duplicate phone if being updated
-    if (driver_phone && driver_phone !== driver.driver_phone) {
-      const existingPhone = await Driver.findOne({ where: { driver_phone } });
+    if (driver_phone && driver_phone.trim() !== driver.driver_phone) {
+      const existingPhone = await Driver.findOne({
+        where: { driver_phone: driver_phone.trim() },
+      });
       if (existingPhone) {
         return res.status(409).json({
           success: false,
@@ -182,8 +205,10 @@ exports.updateDriver = async (req, res) => {
     }
 
     // Check duplicate email if being updated
-    if (driver_email && driver_email !== driver.driver_email) {
-      const existingEmail = await Driver.findOne({ where: { driver_email } });
+    if (driver_email && driver_email.trim() !== driver.driver_email) {
+      const existingEmail = await Driver.findOne({
+        where: { driver_email: driver_email.trim() },
+      });
       if (existingEmail) {
         return res.status(409).json({
           success: false,
@@ -196,12 +221,12 @@ exports.updateDriver = async (req, res) => {
       updated_at: new Date(),
     };
 
-    if (driver_name !== undefined) updateFields.driver_name = driver_name;
-    if (driver_phone !== undefined) updateFields.driver_phone = driver_phone;
-    if (driver_email !== undefined) updateFields.driver_email = driver_email;
+    if (driver_name !== undefined) updateFields.driver_name = driver_name.trim();
+    if (driver_phone !== undefined) updateFields.driver_phone = driver_phone.trim();
+    if (driver_email !== undefined) updateFields.driver_email = driver_email.trim() || null;
     if (status !== undefined) updateFields.status = Number(status);
-    if (password) {
-      updateFields.password = await bcrypt.hash(password, 10);
+    if (password && password.trim()) {
+      updateFields.password = await bcrypt.hash(password.trim(), 10);
     }
 
     await driver.update(updateFields);
@@ -293,4 +318,3 @@ exports.deleteDriver = async (req, res) => {
     });
   }
 };
-
