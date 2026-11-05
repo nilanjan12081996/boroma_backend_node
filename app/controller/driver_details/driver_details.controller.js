@@ -30,6 +30,15 @@ const deleteUploadedFile = (file) => {
   }
 };
 
+// Normalize doc_type to 'L' (Licence) or 'A' (Aadhaar Card)
+const normalizeDocType = (type) => {
+  if (!type) return type;
+  const s = String(type).trim().toUpperCase();
+  if (s === "L" || s === "DRIVING_LICENCE" || s === "LICENCE" || s === "LICENSE") return "L";
+  if (s === "A" || s === "AADHAAR_CARD" || s === "AADHAR" || s === "AADHAAR") return "A";
+  return s;
+};
+
 /**
  * 1. Single function for Create & Update
  * - If params.id is provided -> Update existing record
@@ -39,19 +48,20 @@ exports.saveDriverDetails = async (req, res) => {
   const uploadedFile = getUploadedFile(req);
 
   try {
-    const { id } = req.params;
-    const { driver_id, doc_type, exp_date, status, doc_url: bodyDocUrl } = req.body;
+    const effectiveId = req.params.id || req.body.id;
+    const { driver_id, exp_date, status, doc_url: bodyDocUrl } = req.body;
+    const doc_type = normalizeDocType(req.body.doc_type);
 
     // ==========================================
     // UPDATE OPERATION (id exists in req.params)
     // ==========================================
-    if (id) {
-      const record = await DriverDetails.findByPk(id);
+    if (effectiveId) {
+      const record = await DriverDetails.findByPk(effectiveId);
       if (!record) {
         deleteUploadedFile(uploadedFile);
         return res.status(404).json({
           success: false,
-          message: `Driver details record with id ${id} not found`,
+          message: `Driver details record with id ${effectiveId} not found`,
         });
       }
 
@@ -152,15 +162,39 @@ exports.saveDriverDetails = async (req, res) => {
       });
     }
 
-    // Check duplicate document type for same driver
+    // Check duplicate document type for same driver: auto-update if already exists
     const existingDoc = await DriverDetails.findOne({
       where: { driver_id, doc_type },
     });
     if (existingDoc) {
-      deleteUploadedFile(uploadedFile);
-      return res.status(409).json({
-        success: false,
-        message: `Document type '${doc_type}' already exists for this driver. Use update with id: ${existingDoc.id}`,
+      let finalDocUrl = existingDoc.doc_url;
+      if (uploadedFile) {
+        if (existingDoc.doc_url) {
+          const oldFilePath = path.join(process.cwd(), "uploads", path.basename(existingDoc.doc_url));
+          if (fs.existsSync(oldFilePath)) {
+            try {
+              fs.unlinkSync(oldFilePath);
+            } catch (err) {
+              console.error("Failed to delete old document file:", err.message);
+            }
+          }
+        }
+        finalDocUrl = uploadedFile.filename;
+      } else if (bodyDocUrl !== undefined) {
+        finalDocUrl = bodyDocUrl;
+      }
+
+      await existingDoc.update({
+        doc_url: finalDocUrl,
+        exp_date: doc_type === "A" ? null : exp_date !== undefined ? exp_date || null : existingDoc.exp_date,
+        status: status !== undefined ? Number(status) : existingDoc.status,
+        updated_at: new Date(),
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "Driver details updated successfully",
+        data: existingDoc,
       });
     }
 
