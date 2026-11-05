@@ -1,5 +1,6 @@
 const { Op } = require("sequelize");
 const Category = require("../../models/category.model");
+const { sequelize } = require("../../config/db");
 
 // Fixed allowed short_name values for Category
 const ALLOWED_SHORT_NAMES = [
@@ -15,11 +16,25 @@ exports.ALLOWED_SHORT_NAMES = ALLOWED_SHORT_NAMES;
 
 // 0. Get Allowed Short Names List (for frontend dropdowns/validation)
 exports.getAllowedShortNames = async (req, res) => {
-  return res.status(200).json({
-    success: true,
-    message: "Allowed short names fetched successfully",
-    data: ALLOWED_SHORT_NAMES,
-  });
+  try {
+    const dbShortNames = await Category.findAll({
+      attributes: [[sequelize.fn("DISTINCT", sequelize.col("short_name")), "short_name"]],
+      raw: true,
+    });
+    const foundList = dbShortNames.map((r) => r.short_name).filter(Boolean);
+    const combined = Array.from(new Set([...ALLOWED_SHORT_NAMES, ...foundList]));
+    return res.status(200).json({
+      success: true,
+      message: "Allowed short names fetched successfully",
+      data: combined,
+    });
+  } catch (err) {
+    return res.status(200).json({
+      success: true,
+      message: "Allowed short names fetched successfully",
+      data: ALLOWED_SHORT_NAMES,
+    });
+  }
 };
 
 /**
@@ -356,17 +371,11 @@ exports.createCategory = async (req, res) => {
     const matchedShortName = ALLOWED_SHORT_NAMES.find(
       (name) => name.toLowerCase() === short_name.toString().trim().toLowerCase()
     );
-
-    if (!matchedShortName) {
-      return res.status(400).json({
-        success: false,
-        message: `Invalid short_name. Allowed fields are: ${ALLOWED_SHORT_NAMES.join(", ")}`,
-      });
-    }
+    const finalShortName = matchedShortName || short_name.toString().trim();
 
     const categoryData = await Category.create({
       category_name: category_name.trim(),
-      short_name: matchedShortName,
+      short_name: finalShortName,
       status: 1,
     });
     return res.status(200).json({
@@ -461,14 +470,7 @@ exports.updateCategory = async (req, res) => {
       const matchedShortName = ALLOWED_SHORT_NAMES.find(
         (name) => name.toLowerCase() === short_name.toString().trim().toLowerCase()
       );
-
-      if (!matchedShortName) {
-        return res.status(400).json({
-          success: false,
-          message: `Invalid short_name. Allowed fields are: ${ALLOWED_SHORT_NAMES.join(", ")}`,
-        });
-      }
-      updateData.short_name = matchedShortName;
+      updateData.short_name = matchedShortName || short_name.toString().trim();
     }
 
     await category.update(updateData);
