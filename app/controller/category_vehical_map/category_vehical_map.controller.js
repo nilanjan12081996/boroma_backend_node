@@ -4,6 +4,29 @@ const Category = require("../../models/category.model");
 const VehicleInfo = require("../../models/vehicle_info.model");
 const VehicleImage = require("../../models/vehicle_image.model");
 
+const TRANSPORT_KEYS = ["bus", "car"];
+const VEHICLE_TYPE_KEYS = [
+  "sedan",
+  "suv",
+  "prem-sed",
+  "prem-suv",
+  "10-15 seater",
+  "15-17 seater",
+  "17-26 seater",
+  "26-33 seater",
+  "33-41 seater",
+  "41-55 seater",
+];
+const VEHICLE_MODEL_KEYS = [
+  "swift",
+  "dzire",
+  "wagon-r",
+  "innova",
+  "bharat-benz",
+  "royal-cruiser",
+];
+const FUEL_TYPE_KEYS = ["petrol", "diesel", "cng", "ev"];
+
 // Helper to format vehicle with complete categories and images info
 const formatVehicleDetails = (vehicle, req) => {
   const json = vehicle.toJSON ? vehicle.toJSON() : vehicle;
@@ -20,20 +43,95 @@ const formatVehicleDetails = (vehicle, req) => {
     };
   });
 
-  const formattedCategories = (json.categories || []).map((cat) => ({
-    id: cat.id,
-    [cat.short_name || "category_name"]: cat.category_name,
-    short_name: cat.short_name,
-    status: cat.status,
-    mapping_id: cat.CategoryVehicalMap ? cat.CategoryVehicalMap.id : null,
-    map_status: cat.CategoryVehicalMap ? cat.CategoryVehicalMap.status : 1,
-  }));
+  let transportTypeCat = null;
+  let vehicleTypeCat = null;
+  let vehicleModelCat = null;
+  let fuelTypeCat = null;
+
+  const formattedCategories = (json.categories || []).map((cat) => {
+    const sName = (cat.short_name || "").toLowerCase().trim();
+    let classification = "other";
+    if (sName === "transport_type" || TRANSPORT_KEYS.includes(sName)) {
+      classification = "transport_type";
+      if (!transportTypeCat) transportTypeCat = cat;
+    } else if (sName === "car_type" || sName === "bus_type" || VEHICLE_TYPE_KEYS.includes(sName)) {
+      classification = "vehicle_type";
+      if (!vehicleTypeCat) vehicleTypeCat = cat;
+    } else if (sName === "car_model" || sName === "bus_model" || VEHICLE_MODEL_KEYS.includes(sName)) {
+      classification = "vehicle_model";
+      if (!vehicleModelCat) vehicleModelCat = cat;
+    } else if (sName === "fuel_type" || FUEL_TYPE_KEYS.includes(sName)) {
+      classification = "fuel_type";
+      if (!fuelTypeCat) fuelTypeCat = cat;
+    } else if (sName === "frequency_type") {
+      classification = "frequency_type";
+    }
+
+    return {
+      id: cat.id,
+      category_name: cat.category_name,
+      short_name: cat.short_name,
+      classification,
+      [cat.short_name || "category_name"]: cat.category_name,
+      status: cat.status,
+      mapping_id: cat.CategoryVehicalMap ? cat.CategoryVehicalMap.id : null,
+      map_status: cat.CategoryVehicalMap ? cat.CategoryVehicalMap.status : 1,
+    };
+  });
+
+  // Fallback deduction if transport_type wasn't explicitly mapped
+  if (!transportTypeCat) {
+    const isBus = (json.categories || []).some((c) => {
+      const s = (c.short_name || "").toLowerCase();
+      return (
+        s.includes("seater") ||
+        s.includes("benz") ||
+        s.includes("cruiser") ||
+        s === "bus"
+      );
+    });
+    if (isBus) {
+      transportTypeCat = { category_name: "Bus", short_name: "bus" };
+    } else if ((json.categories || []).length > 0) {
+      transportTypeCat = { category_name: "Car", short_name: "car" };
+    }
+  }
+
+  const getSpecificKey = (cat) => {
+    if (!cat) return null;
+    const s = (cat.short_name || "").toLowerCase().trim();
+    const groupKeys = [
+      "transport_type",
+      "car_type",
+      "bus_type",
+      "car_model",
+      "bus_model",
+      "fuel_type",
+    ];
+    if (groupKeys.includes(s) && cat.category_name) {
+      return cat.category_name.toLowerCase().trim();
+    }
+    return (cat.short_name || cat.category_name || "").toLowerCase().trim();
+  };
 
   return {
     id: json.id,
     vehicle_no: json.vehicle_no,
     no_of_seat: json.no_of_seat,
     status: json.status,
+    transport_type: transportTypeCat ? transportTypeCat.category_name : null,
+    transport_type_key: getSpecificKey(transportTypeCat),
+    vehicle_type: vehicleTypeCat ? vehicleTypeCat.category_name : null,
+    vehicle_type_key: getSpecificKey(vehicleTypeCat),
+    vehicle_model: vehicleModelCat ? vehicleModelCat.category_name : null,
+    vehicle_model_key: getSpecificKey(vehicleModelCat),
+    fuel_type: fuelTypeCat ? fuelTypeCat.category_name : null,
+    fuel_type_key: getSpecificKey(fuelTypeCat),
+    category_name: transportTypeCat
+      ? transportTypeCat.category_name
+      : vehicleTypeCat
+      ? vehicleTypeCat.category_name
+      : "Car",
     total_categories: formattedCategories.length,
     categories: formattedCategories,
     total_images: formattedImages.length,
@@ -45,8 +143,6 @@ const formatVehicleDetails = (vehicle, req) => {
 exports.createCategoryVehicleMap = async (req, res) => {
   try {
     const vehicle_id = req.body.vehicle_id || req.body.vehical_id;
-    const rawCategoryIds =
-      req.body.category_id || req.body.category_ids || req.body.categories;
     const { status, replace } = req.body;
 
     // 1. Validate vehicle_id
@@ -57,22 +153,61 @@ exports.createCategoryVehicleMap = async (req, res) => {
       });
     }
 
-    // 2. Validate category_id presence
-    if (!rawCategoryIds) {
-      return res.status(400).json({
-        success: false,
-        message: "category_id is required (e.g. [2, 3, 4, 5] or '2,3,4,5')",
+    // 2. Gather all Category IDs from category_ids, category_id, and categories
+    let categoryArray = [];
+    if (Array.isArray(req.body.category_ids)) {
+      categoryArray.push(...req.body.category_ids);
+    } else if (typeof req.body.category_ids === "string") {
+      categoryArray.push(...req.body.category_ids.split(",").map((s) => s.trim()));
+    } else if (req.body.category_ids) {
+      categoryArray.push(req.body.category_ids);
+    }
+
+    if (Array.isArray(req.body.category_id)) {
+      categoryArray.push(...req.body.category_id);
+    } else if (typeof req.body.category_id === "string") {
+      categoryArray.push(...req.body.category_id.split(",").map((s) => s.trim()));
+    } else if (req.body.category_id) {
+      categoryArray.push(req.body.category_id);
+    }
+
+    if (Array.isArray(req.body.categories)) {
+      req.body.categories.forEach((c) => {
+        if (typeof c === "object" && c !== null) {
+          if (c.id) categoryArray.push(c.id);
+          if (c.category_id) categoryArray.push(c.category_id);
+        } else if (c) {
+          categoryArray.push(c);
+        }
       });
     }
 
-    // 3. Normalize category_id into an array of unique positive numbers
-    let categoryArray = [];
-    if (Array.isArray(rawCategoryIds)) {
-      categoryArray = rawCategoryIds;
-    } else if (typeof rawCategoryIds === "string") {
-      categoryArray = rawCategoryIds.split(",").map((id) => id.trim());
-    } else {
-      categoryArray = [rawCategoryIds];
+    // Auto-resolve IDs from classification keys / names:
+    const classificationNames = [
+      req.body.transport_type,
+      req.body.vehicle_type,
+      req.body.vehicle_model,
+      req.body.fuel_type,
+    ]
+      .filter(Boolean)
+      .map((v) => String(v).trim());
+
+    if (classificationNames.length > 0) {
+      try {
+        const lowerKeys = classificationNames.map((v) => v.toLowerCase());
+        const matchedCats = await Category.findAll({
+          where: {
+            [Op.or]: [
+              { short_name: { [Op.in]: lowerKeys } },
+              { category_name: { [Op.in]: classificationNames } },
+            ],
+          },
+          attributes: ["id"],
+        });
+        matchedCats.forEach((c) => categoryArray.push(c.id));
+      } catch (err) {
+        console.warn("Classification lookup in mapping error:", err.message);
+      }
     }
 
     categoryArray = [
@@ -521,4 +656,3 @@ exports.getAllVehiclesFullDetails = async (req, res) => {
     });
   }
 };
-

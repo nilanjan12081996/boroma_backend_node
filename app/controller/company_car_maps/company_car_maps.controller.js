@@ -2,6 +2,9 @@ const { Op } = require('sequelize');
 const CompanyCarMap = require('../../models/company_car_maps.model');
 const Company = require('../../models/company.model');
 const VehicleInfo = require('../../models/vehicle_info.model');
+const Category = require('../../models/category.model');
+const VehicleImage = require('../../models/vehicle_image.model');
+require('../../models/category_vehical_map.model');
 
 // Helper to format response (optional)
 const formatMapping = (mapping, req) => {
@@ -166,6 +169,19 @@ exports.getAvailableVehicles = async (req, res) => {
 
     const availableVehicles = await VehicleInfo.findAll({
       where: filter,
+      include: [
+        {
+          model: Category,
+          as: 'categories',
+          through: { attributes: [] },
+          required: false,
+        },
+        {
+          model: VehicleImage,
+          as: 'images',
+          required: false,
+        },
+      ],
       order: [['id', 'DESC']],
     });
 
@@ -205,7 +221,18 @@ exports.getAllCompanyVehicleMaps = async (req, res) => {
       where: filter,
       include: [
         { model: Company, as: 'company' },
-        { model: VehicleInfo, as: 'vehicle' },
+        {
+          model: VehicleInfo,
+          as: 'vehicle',
+          include: [
+            {
+              model: Category,
+              as: 'categories',
+              through: { attributes: [] },
+              required: false,
+            },
+          ],
+        },
       ],
       order: [['id', 'DESC']],
     });
@@ -292,7 +319,20 @@ exports.getVehiclesByCompanyId = async (req, res) => {
     const { company_id } = req.params;
     const mappings = await CompanyCarMap.findAll({
       where: { company_id },
-      include: [{ model: VehicleInfo, as: 'vehicle' }],
+      include: [
+        {
+          model: VehicleInfo,
+          as: 'vehicle',
+          include: [
+            {
+              model: Category,
+              as: 'categories',
+              through: { attributes: [] },
+              required: false,
+            },
+          ],
+        },
+      ],
       order: [['id', 'DESC']],
     });
     return res.status(200).json({ success: true, message: 'Vehicles for company fetched', total: mappings.length, data: mappings });
