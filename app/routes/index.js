@@ -14,6 +14,7 @@ const VehiclePollutionRoutes = require('./vehicle_pollution/vehicle_pollution.ro
 const VehicleTaxRoutes = require('./vehicle_tax/vehicle_tax.routes')
 const VehicleFitnessRoutes = require('./vehicle_fitness/vehicle_fitness.routes')
 const DriverRoutes = require('./driver/driver.routes')
+const DriverDetailsRoutes = require('./driver_details/driver_details.routes')
 
 router.use('/category', CategoryRoutes)
 
@@ -44,5 +45,8 @@ router.use('/vehical-fitness', VehicleFitnessRoutes)
 
 router.use('/driver', DriverRoutes)
 router.use('/drivers', DriverRoutes)
+
+router.use('/driver-details', DriverDetailsRoutes)
+router.use('/driver-detail', DriverDetailsRoutes)
 
 module.exports = router

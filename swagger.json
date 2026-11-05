@@ -67,6 +67,10 @@
     {
       "name": "Driver",
       "description": "Driver management (Registration, Read, Update, Delete, Toggle Status)"
+    },
+    {
+      "name": "Driver Details",
+      "description": "Driver KYC documents (Licence, Aadhar Card) upload, single/all fetch, toggle status and delete"
     }
   ],
   "components": {
@@ -946,6 +950,93 @@
             "type": "integer",
             "example": 1,
             "description": "1 for Active, 0 for Inactive"
+          }
+        }
+      },
+      "DriverDetails": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "driver_id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "doc_type": {
+            "type": "string",
+            "enum": [
+              "L",
+              "A"
+            ],
+            "example": "L",
+            "description": "'L' for Licence, 'A' for Aadhar Card"
+          },
+          "doc_url": {
+            "type": "string",
+            "example": "licence-file-1740000000000.pdf",
+            "description": "Uploaded document filename or URL"
+          },
+          "exp_date": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "example": "2030-12-31",
+            "description": "Expiry date (YYYY-MM-DD), always null for Aadhar ('A')"
+          },
+          "status": {
+            "type": "integer",
+            "example": 1,
+            "description": "1 = active, 0 = inactive"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "driver": {
+            "$ref": "#/components/schemas/Driver"
+          }
+        }
+      },
+      "SaveDriverDetailsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Driver details saved successfully"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DriverDetails"
+          }
+        }
+      },
+      "DriverDetailsListResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "count": {
+            "type": "integer",
+            "example": 1
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DriverDetails"
+            }
           }
         }
       }
@@ -7781,6 +7872,1461 @@
                 "example": {
                   "success": false,
                   "message": "Driver with this phone number already exists"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/driver-details/save": {
+      "post": {
+        "tags": [
+          "Driver Details"
+        ],
+        "summary": "Create driver document record (without ID)",
+        "description": "Create a KYC document record for a driver by uploading a file (Licence or Aadhar Card) or providing doc_url. Note: If doc_type is 'A' (Aadhar), exp_date is always saved as null.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "driver_id",
+                  "doc_type"
+                ],
+                "properties": {
+                  "driver_id": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "ID of the driver"
+                  },
+                  "doc_type": {
+                    "type": "string",
+                    "enum": [
+                      "L",
+                      "A"
+                    ],
+                    "example": "L",
+                    "description": "'L' for Licence, 'A' for Aadhar Card"
+                  },
+                  "doc_url": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Document file to upload (PDF, PNG, JPG)"
+                  },
+                  "exp_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2030-12-31",
+                    "description": "Expiry date (ignored / saved as null if doc_type is 'A')"
+                  },
+                  "status": {
+                    "type": "integer",
+                    "default": 1,
+                    "example": 1,
+                    "description": "1 = active, 0 = inactive"
+                  }
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "driver_id",
+                  "doc_type"
+                ],
+                "properties": {
+                  "driver_id": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "ID of the driver"
+                  },
+                  "doc_type": {
+                    "type": "string",
+                    "enum": [
+                      "L",
+                      "A"
+                    ],
+                    "example": "L",
+                    "description": "'L' for Licence, 'A' for Aadhar Card"
+                  },
+                  "doc_url": {
+                    "type": "string",
+                    "example": "licence.pdf",
+                    "description": "Document filename or URL"
+                  },
+                  "exp_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2030-12-31",
+                    "description": "Expiry date (ignored / saved as null if doc_type is 'A')"
+                  },
+                  "status": {
+                    "type": "integer",
+                    "default": 1,
+                    "example": 1,
+                    "description": "1 = active, 0 = inactive"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Driver details created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaveDriverDetailsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Missing required fields or invalid doc_type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Token is required or invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Requires SUPERADMIN role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Driver not found with provided driver_id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Document type already exists for this driver",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/driver-details/save/{id}": {
+      "post": {
+        "tags": [
+          "Driver Details"
+        ],
+        "summary": "Update driver document record via POST",
+        "description": "Update an existing driver document record by its primary ID. If a new file is uploaded, the old file is deleted. If doc_type is 'A', exp_date is always saved as null.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Primary ID of the driver details record"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "driver_id": {
+                    "type": "integer",
+                    "example": 1,
+                    "description": "ID of the driver"
+                  },
+                  "doc_type": {
+                    "type": "string",
+                    "enum": [
+                      "L",
+                      "A"
+                    ],
+                    "example": "L",
+                    "description": "'L' for Licence, 'A' for Aadhar Card"
+                  },
+                  "doc_url": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "New document file to upload"
+                  },
+                  "exp_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2030-12-31",
+                    "description": "Expiry date (always null if doc_type is 'A')"
+                  },
+                  "status": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "driver_id": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "doc_type": {
+                    "type": "string",
+                    "enum": [
+                      "L",
+                      "A"
+                    ],
+                    "example": "L"
+                  },
+                  "doc_url": {
+                    "type": "string",
+                    "example": "licence.pdf"
+                  },
+                  "exp_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2030-12-31"
+                  },
+                  "status": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Driver details updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaveDriverDetailsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Driver details record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Driver Details"
+        ],
+        "summary": "Update driver document record via PUT",
+        "description": "Update an existing driver document record by its primary ID. If a new file is uploaded, the old file is deleted. If doc_type is 'A', exp_date is always saved as null.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Primary ID of the driver details record"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "driver_id": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "doc_type": {
+                    "type": "string",
+                    "enum": [
+                      "L",
+                      "A"
+                    ],
+                    "example": "L"
+                  },
+                  "doc_url": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "New document file"
+                  },
+                  "exp_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2030-12-31"
+                  },
+                  "status": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "driver_id": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "doc_type": {
+                    "type": "string",
+                    "enum": [
+                      "L",
+                      "A"
+                    ],
+                    "example": "L"
+                  },
+                  "doc_url": {
+                    "type": "string",
+                    "example": "licence.pdf"
+                  },
+                  "exp_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2030-12-31"
+                  },
+                  "status": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Driver details updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaveDriverDetailsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Driver details record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/driver-details/get": {
+      "get": {
+        "tags": [
+          "Driver Details"
+        ],
+        "summary": "Get all driver details (with optional filters)",
+        "description": "Retrieve all driver KYC document records. Supports filtering by driver_id, doc_type, and status.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "driver_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter records by driver_id"
+          },
+          {
+            "name": "doc_type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "L",
+                "A"
+              ]
+            },
+            "description": "'Filter by doc_type ('L' for Licence, 'A' for Aadhar)"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            },
+            "description": "Filter by status (1 = active, 0 = inactive)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Driver details list fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DriverDetailsListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/driver-details/get/{id}": {
+      "get": {
+        "tags": [
+          "Driver Details"
+        ],
+        "summary": "Get single driver detail by ID",
+        "description": "Retrieve a specific driver document record by its primary ID, including driver profile details.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Primary ID of the driver details record"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Driver detail record fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/DriverDetails"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Driver details record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/driver-details/{id}/toggle-status": {
+      "patch": {
+        "tags": [
+          "Driver Details"
+        ],
+        "summary": "Toggle driver document status",
+        "description": "Toggles status between 1 (active) and 0 (inactive).",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Primary ID of the driver details record"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Driver details status updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Driver details status updated successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "driver_id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "doc_type": {
+                          "type": "string",
+                          "example": "L"
+                        },
+                        "status": {
+                          "type": "integer",
+                          "example": 0
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Driver details record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/driver-details/delete/{id}": {
+      "delete": {
+        "tags": [
+          "Driver Details"
+        ],
+        "summary": "Delete driver document record",
+        "description": "Permanently deletes the driver detail record and deletes the uploaded document file from disk.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Primary ID of the driver details record"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Driver details record deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Driver details record deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Driver details record not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/category/transport-types": {
+      "get": {
+        "tags": [
+          "Category"
+        ],
+        "summary": "Get Transport Types for dropdown",
+        "description": "Fetch active transport types (bus, car) for dropdown selection.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transport Types fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Transport Types fetched successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "category_name": {
+                            "type": "string",
+                            "example": "Car"
+                          },
+                          "short_name": {
+                            "type": "string",
+                            "example": "car"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/category/car-types": {
+      "get": {
+        "tags": [
+          "Category"
+        ],
+        "summary": "Get Car Types for dropdown",
+        "description": "Fetch active car types (sedan, suv, etc.) for dropdown selection.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Car Types fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Car Types fetched successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "category_name": {
+                            "type": "string",
+                            "example": "Car"
+                          },
+                          "short_name": {
+                            "type": "string",
+                            "example": "car"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/category/bus-types": {
+      "get": {
+        "tags": [
+          "Category"
+        ],
+        "summary": "Get Bus Types for dropdown",
+        "description": "Fetch active bus seating types (10-15 seater, etc.) for dropdown selection.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bus Types fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bus Types fetched successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "category_name": {
+                            "type": "string",
+                            "example": "Car"
+                          },
+                          "short_name": {
+                            "type": "string",
+                            "example": "car"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/category/fuel-types": {
+      "get": {
+        "tags": [
+          "Category"
+        ],
+        "summary": "Get Fuel Types for dropdown",
+        "description": "Fetch active fuel types (petrol, diesel, cng, ev) for dropdown selection.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fuel Types fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Fuel Types fetched successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "category_name": {
+                            "type": "string",
+                            "example": "Car"
+                          },
+                          "short_name": {
+                            "type": "string",
+                            "example": "car"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/category/bus-model": {
+      "get": {
+        "tags": [
+          "Category"
+        ],
+        "summary": "Get Bus Models for dropdown",
+        "description": "Fetch active bus models (bharat-benz, royal-cruiser) for dropdown selection.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bus Models fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bus Models fetched successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "category_name": {
+                            "type": "string",
+                            "example": "Car"
+                          },
+                          "short_name": {
+                            "type": "string",
+                            "example": "car"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/category/car-model": {
+      "get": {
+        "tags": [
+          "Category"
+        ],
+        "summary": "Get Car Models for dropdown",
+        "description": "Fetch active car models (swift, dzire, wagon-r, innova) for dropdown selection.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Car Models fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Car Models fetched successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "category_name": {
+                            "type": "string",
+                            "example": "Car"
+                          },
+                          "short_name": {
+                            "type": "string",
+                            "example": "car"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/company-car-map/unmapped-vehicles": {
+      "get": {
+        "tags": [
+          "Company Car Map"
+        ],
+        "summary": "Get all available / unmapped vehicles",
+        "description": "Fetch vehicles that are active and not currently assigned to any company.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Available vehicles fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Available vehicles fetched successfully"
+                    },
+                    "count": {
+                      "type": "integer",
+                      "example": 5
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/VehicleInfo"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardErrorResponse"
                 }
               }
             }
