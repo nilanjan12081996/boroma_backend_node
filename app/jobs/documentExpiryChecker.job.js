@@ -3,6 +3,8 @@ const VehicleFitness = require("../models/vehicle_fitness.model");
 const VehicleTax = require("../models/vehicle_tax.model");
 const VehiclePermit = require("../models/vehicle_permit.model");
 const VehiclePollution = require("../models/vehicle_pollution.model");
+const VehicleRC = require("../models/vehicle_rc.model");
+const VehicleInsurance = require("../models/vehicle_insurance.model");
 const VehicleInfo = require("../models/vehicle_info.model");
 const { sendMail } = require("../utils/mailer");
 const { getDocumentExpiryEmailTemplate } = require("../utils/emailTemplates/documentExpiry.template");
@@ -19,6 +21,8 @@ const DOCUMENT_CONFIG = [
   { model: VehicleTax, label: "Vehicle Tax" },
   { model: VehiclePermit, label: "Vehicle Permit" },
   { model: VehiclePollution, label: "Pollution Under Control (PUC) Certificate" },
+  { model: VehicleRC, label: "Vehicle Registration Certificate (RC)" },
+  { model: VehicleInsurance, label: "Vehicle Insurance Certificate" },
 ];
 
 /**

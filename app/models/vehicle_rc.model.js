@@ -22,7 +22,7 @@ const VehicleRC = sequelize.define(
     },
     exp_date: {
       type: DataTypes.DATEONLY,
-      allowNull: true,
+      defaultValue: null,
     },
     status: {
       type: DataTypes.TINYINT,
