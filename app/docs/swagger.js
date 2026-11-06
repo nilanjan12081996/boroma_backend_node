@@ -899,6 +899,12 @@ const swaggerDocument = {
             "type": "string",
             "format": "date-time",
             "example": "2026-11-02T08:00:00.000Z"
+          },
+          "profile_img": {
+            "type": "string",
+            "nullable": true,
+            "example": "driver-profile-1740000000000.png",
+            "description": "Profile image filename or URL"
           }
         }
       },
@@ -928,6 +934,11 @@ const swaggerDocument = {
             "type": "string",
             "example": "Pass@123",
             "description": "Optional: If omitted, a random 8-character password with upper, lower, numbers, and special chars (@#$!%*?&) will be auto-generated"
+          },
+          "profile_img": {
+            "type": "string",
+            "example": "driver-profile.png",
+            "description": "Profile image filename, URL, or uploaded via multipart/form-data"
           }
         }
       },
@@ -954,6 +965,11 @@ const swaggerDocument = {
             "type": "integer",
             "example": 1,
             "description": "1 for Active, 0 for Inactive"
+          },
+          "profile_img": {
+            "type": "string",
+            "example": "driver-profile-new.png",
+            "description": "Profile image filename, URL, or uploaded via multipart/form-data"
           }
         }
       },
@@ -974,10 +990,11 @@ const swaggerDocument = {
             "type": "string",
             "enum": [
               "L",
-              "A"
+              "A",
+              "BK"
             ],
             "example": "L",
-            "description": "'L' for Licence, 'A' for Aadhar Card"
+            "description": "'L' for Licence, 'A' for Aadhar Card, 'BK' for Bank Passbook"
           },
           "doc_url": {
             "type": "string",
@@ -7514,6 +7531,38 @@ const swaggerDocument = {
               "schema": {
                 "$ref": "#/components/schemas/UpdateDriverPayload"
               }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "driver_name": {
+                    "type": "string",
+                    "example": "Rajesh Kumar"
+                  },
+                  "driver_phone": {
+                    "type": "string",
+                    "example": "9876543210"
+                  },
+                  "driver_email": {
+                    "type": "string",
+                    "example": "rajesh.updated@boroma.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "NewSecret@123"
+                  },
+                  "profile_img": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Driver profile image file to replace old image"
+                  },
+                  "status": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
             }
           }
         },
@@ -7778,6 +7827,42 @@ const swaggerDocument = {
               "schema": {
                 "$ref": "#/components/schemas/CreateDriverPayload"
               }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "driver_name",
+                  "driver_phone"
+                ],
+                "properties": {
+                  "driver_name": {
+                    "type": "string",
+                    "example": "Rajesh Kumar"
+                  },
+                  "driver_phone": {
+                    "type": "string",
+                    "example": "9876543210"
+                  },
+                  "driver_email": {
+                    "type": "string",
+                    "example": "rajesh@boroma.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "Pass@123"
+                  },
+                  "profile_img": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Driver profile image file (PNG, JPG)"
+                  },
+                  "status": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
             }
           }
         },
@@ -7925,7 +8010,8 @@ const swaggerDocument = {
                     "type": "string",
                     "enum": [
                       "L",
-                      "A"
+                      "A",
+                      "BK"
                     ],
                     "example": "L",
                     "description": "'L' for Licence, 'A' for Aadhar Card"
@@ -7967,7 +8053,8 @@ const swaggerDocument = {
                     "type": "string",
                     "enum": [
                       "L",
-                      "A"
+                      "A",
+                      "BK"
                     ],
                     "example": "L",
                     "description": "'L' for Licence, 'A' for Aadhar Card"
@@ -8106,7 +8193,8 @@ const swaggerDocument = {
                     "type": "string",
                     "enum": [
                       "L",
-                      "A"
+                      "A",
+                      "BK"
                     ],
                     "example": "L",
                     "description": "'L' for Licence, 'A' for Aadhar Card"
@@ -8141,7 +8229,8 @@ const swaggerDocument = {
                     "type": "string",
                     "enum": [
                       "L",
-                      "A"
+                      "A",
+                      "BK"
                     ],
                     "example": "L"
                   },
@@ -8262,7 +8351,8 @@ const swaggerDocument = {
                     "type": "string",
                     "enum": [
                       "L",
-                      "A"
+                      "A",
+                      "BK"
                     ],
                     "example": "L"
                   },
@@ -8295,7 +8385,8 @@ const swaggerDocument = {
                     "type": "string",
                     "enum": [
                       "L",
-                      "A"
+                      "A",
+                      "BK"
                     ],
                     "example": "L"
                   },
@@ -8409,7 +8500,8 @@ const swaggerDocument = {
               "type": "string",
               "enum": [
                 "L",
-                "A"
+                "A",
+                "BK"
               ]
             },
             "description": "'Filter by doc_type ('L' for Licence, 'A' for Aadhar)"

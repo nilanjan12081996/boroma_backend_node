@@ -30,12 +30,13 @@ const deleteUploadedFile = (file) => {
   }
 };
 
-// Normalize doc_type to 'L' (Licence) or 'A' (Aadhaar Card)
+// Normalize doc_type to 'L' (Licence) or 'A' (Aadhaar Card) or 'BK' (Passbook)
 const normalizeDocType = (type) => {
   if (!type) return type;
   const s = String(type).trim().toUpperCase();
   if (s === "L" || s === "DRIVING_LICENCE" || s === "LICENCE" || s === "LICENSE") return "L";
   if (s === "A" || s === "AADHAAR_CARD" || s === "AADHAR" || s === "AADHAAR") return "A";
+  if (s === "BK" || s === "BANK-PASSBOOK" || s === "PASSBOOK" || s === "PASS-BOOK") return "BK";
   return s;
 };
 
@@ -78,11 +79,11 @@ exports.saveDriverDetails = async (req, res) => {
       }
 
       // Validate doc_type if provided
-      if (doc_type && !["L", "A"].includes(doc_type)) {
+      if (doc_type && !["L", "A", "BK"].includes(doc_type)) {
         deleteUploadedFile(uploadedFile);
         return res.status(400).json({
           success: false,
-          message: "Invalid doc_type. Allowed values are 'L' (Licence) or 'A' (Aadhar Card)",
+          message: "Invalid doc_type. Allowed values are 'L' (Licence) or 'A' (Aadhar Card) or 'BK' (BANK PASSBOOK)",
         });
       }
 
@@ -108,13 +109,13 @@ exports.saveDriverDetails = async (req, res) => {
       // Resolve effective doc_type
       const effectiveDocType = doc_type !== undefined ? doc_type : record.doc_type;
 
-      // If doc_type is "A", exp_date will always be null
+      // If doc_type is "A" and "BK" exp_date will always be null
       const finalExpDate =
-        effectiveDocType === "A"
+        effectiveDocType === "A" || effectiveDocType === "BK"
           ? null
           : exp_date !== undefined
-          ? exp_date || null
-          : record.exp_date;
+            ? exp_date || null
+            : record.exp_date;
 
       await record.update({
         driver_id: driver_id !== undefined ? driver_id : record.driver_id,
@@ -139,16 +140,16 @@ exports.saveDriverDetails = async (req, res) => {
       deleteUploadedFile(uploadedFile);
       return res.status(400).json({
         success: false,
-        message: "driver_id and doc_type ('L' for Licence, 'A' for Aadhar Card) are required",
+        message: "driver_id and doc_type ('L' for Licence, 'A' for Aadhar Card, 'BK' for BANK PASSBOOK ) are required",
       });
     }
 
     // Validate doc_type
-    if (!["L", "A"].includes(doc_type)) {
+    if (!["L", "A", "BK"].includes(doc_type)) {
       deleteUploadedFile(uploadedFile);
       return res.status(400).json({
         success: false,
-        message: "Invalid doc_type. Allowed values are 'L' (Licence) or 'A' (Aadhar Card)",
+        message: "Invalid doc_type. Allowed values are 'L' (Licence) or 'A' (Aadhar Card) or 'BK' (BANK PASSBOOK)",
       });
     }
 
@@ -186,7 +187,12 @@ exports.saveDriverDetails = async (req, res) => {
 
       await existingDoc.update({
         doc_url: finalDocUrl,
-        exp_date: doc_type === "A" ? null : exp_date !== undefined ? exp_date || null : existingDoc.exp_date,
+        exp_date:
+          doc_type === "A" || doc_type === "BK"
+            ? null
+            : exp_date !== undefined
+              ? exp_date || null
+              : existingDoc.exp_date,
         status: status !== undefined ? Number(status) : existingDoc.status,
         updated_at: new Date(),
       });
@@ -209,7 +215,7 @@ exports.saveDriverDetails = async (req, res) => {
       driver_id,
       doc_type,
       doc_url: finalDocUrl,
-      exp_date: doc_type == "A" ? null : exp_date || null,
+      exp_date: doc_type === "A" || doc_type === "BK" ? null : exp_date || null,
       status: status !== undefined ? Number(status) : 1,
       created_at: new Date(),
       updated_at: new Date(),

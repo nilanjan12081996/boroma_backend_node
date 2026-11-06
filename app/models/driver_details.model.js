@@ -21,7 +21,7 @@ const DriverDetails = sequelize.define(
       },
     },
     doc_type: {
-      type: DataTypes.ENUM("L", "A"), // "L" -> Licence, "A" -> Aadhar Card
+      type: DataTypes.ENUM("L", "A", "BK"), // "L" -> Licence, "A" -> Aadhar Card, "BK" -> Bank-Passbook
       allowNull: false,
     },
     doc_url: {

@@ -1,7 +1,36 @@
+const fs = require("fs");
+const path = require("path");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const Driver = require("../../models/driver.model");
 const { Op } = require("sequelize");
+
+// Helper to collect uploaded file from multer
+const getUploadedFile = (req) => {
+  if (req.file) return req.file;
+  if (Array.isArray(req.files) && req.files.length > 0) return req.files[0];
+  if (req.files && typeof req.files === "object") {
+    for (const key of Object.keys(req.files)) {
+      const item = req.files[key];
+      if (Array.isArray(item) && item.length > 0) return item[0];
+      if (item) return item;
+    }
+  }
+  return null;
+};
+
+// Helper to safely delete file from uploads
+const deleteUploadedFile = (file) => {
+  if (!file) return;
+  const filePath = typeof file === "string" ? file : file?.path;
+  if (filePath && fs.existsSync(filePath)) {
+    try {
+      fs.unlinkSync(filePath);
+    } catch (err) {
+      console.error("Failed to delete file:", err.message);
+    }
+  }
+};
 
 // Helper to generate a random password if not supplied
 function generateRandomPassword() {
@@ -28,6 +57,7 @@ function generateRandomPassword() {
 
 // 1. Create / Register Driver
 exports.createDriver = async (req, res) => {
+  const uploadedFile = getUploadedFile(req);
   try {
     const driver_name = (req.body.driver_name || req.body.name || "").trim();
     const driver_phone = (
@@ -41,7 +71,16 @@ exports.createDriver = async (req, res) => {
     const status =
       req.body.status !== undefined ? Number(req.body.status) : 1; // Default 1 (Active)
 
+    // profile_img from uploaded file or body string
+    let profile_img = null;
+    if (uploadedFile) {
+      profile_img = uploadedFile.filename;
+    } else if (req.body.profile_img || req.body.image) {
+      profile_img = (req.body.profile_img || req.body.image).trim();
+    }
+
     if (!driver_name || !driver_phone) {
+      deleteUploadedFile(uploadedFile);
       return res.status(400).json({
         success: false,
         message: "driver_name and driver_phone are required",
@@ -51,6 +90,7 @@ exports.createDriver = async (req, res) => {
     // Check duplicate phone
     const existingPhone = await Driver.findOne({ where: { driver_phone } });
     if (existingPhone) {
+      deleteUploadedFile(uploadedFile);
       return res.status(409).json({
         success: false,
         message: "Driver with this phone number already exists",
@@ -61,6 +101,7 @@ exports.createDriver = async (req, res) => {
     if (driver_email) {
       const existingEmail = await Driver.findOne({ where: { driver_email } });
       if (existingEmail) {
+        deleteUploadedFile(uploadedFile);
         return res.status(409).json({
           success: false,
           message: "Driver with this email already exists",
@@ -75,6 +116,7 @@ exports.createDriver = async (req, res) => {
       driver_name,
       driver_phone,
       driver_email: driver_email || null,
+      profile_img: profile_img || null,
       password: hashedPassword,
       status: status !== undefined ? status : 1,
       created_at: new Date(),
@@ -93,6 +135,7 @@ exports.createDriver = async (req, res) => {
       data: responseData,
     });
   } catch (error) {
+    deleteUploadedFile(uploadedFile);
     console.error("Create Driver error:", error);
     return res.status(500).json({
       success: false,
@@ -175,6 +218,7 @@ exports.getDriverById = async (req, res) => {
 
 // 4. Update Driver
 exports.updateDriver = async (req, res) => {
+  const uploadedFile = getUploadedFile(req);
   try {
     const { id } = req.params;
     const driver_name = req.body.driver_name || req.body.name;
@@ -182,9 +226,11 @@ exports.updateDriver = async (req, res) => {
     const driver_email = req.body.driver_email || req.body.email;
     const status = req.body.status;
     const password = req.body.password;
+    const bodyProfileImg = req.body.profile_img || req.body.image;
 
     const driver = await Driver.findByPk(id);
     if (!driver) {
+      deleteUploadedFile(uploadedFile);
       return res.status(404).json({
         success: false,
         message: "Driver not found",
@@ -197,6 +243,7 @@ exports.updateDriver = async (req, res) => {
         where: { driver_phone: driver_phone.trim() },
       });
       if (existingPhone) {
+        deleteUploadedFile(uploadedFile);
         return res.status(409).json({
           success: false,
           message: "Driver with this phone number already exists",
@@ -210,6 +257,7 @@ exports.updateDriver = async (req, res) => {
         where: { driver_email: driver_email.trim() },
       });
       if (existingEmail) {
+        deleteUploadedFile(uploadedFile);
         return res.status(409).json({
           success: false,
           message: "Driver with this email already exists",
@@ -229,6 +277,24 @@ exports.updateDriver = async (req, res) => {
       updateFields.password = await bcrypt.hash(password.trim(), 10);
     }
 
+    // Handle profile_img update (file upload or body string)
+    if (uploadedFile) {
+      // Remove old file from uploads directory if exists
+      if (driver.profile_img) {
+        const oldFilePath = path.join(process.cwd(), "uploads", path.basename(driver.profile_img));
+        if (fs.existsSync(oldFilePath)) {
+          try {
+            fs.unlinkSync(oldFilePath);
+          } catch (err) {
+            console.error("Failed to delete old profile image:", err.message);
+          }
+        }
+      }
+      updateFields.profile_img = uploadedFile.filename;
+    } else if (bodyProfileImg !== undefined) {
+      updateFields.profile_img = bodyProfileImg ? bodyProfileImg.trim() : null;
+    }
+
     await driver.update(updateFields);
 
     const updatedData = driver.toJSON();
@@ -242,6 +308,7 @@ exports.updateDriver = async (req, res) => {
       data: updatedData,
     });
   } catch (error) {
+    deleteUploadedFile(uploadedFile);
     console.error("Update Driver error:", error);
     return res.status(500).json({
       success: false,
@@ -301,6 +368,18 @@ exports.deleteDriver = async (req, res) => {
         success: false,
         message: "Driver not found",
       });
+    }
+
+    // Delete associated profile image file if exists on disk
+    if (driver.profile_img) {
+      const filePath = path.join(process.cwd(), "uploads", path.basename(driver.profile_img));
+      if (fs.existsSync(filePath)) {
+        try {
+          fs.unlinkSync(filePath);
+        } catch (err) {
+          console.error("Failed to delete driver profile image:", err.message);
+        }
+      }
     }
 
     await driver.destroy();
