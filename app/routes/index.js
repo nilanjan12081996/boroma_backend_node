@@ -17,6 +17,7 @@ const VehicleRCRoutes = require('./vehicle_rc/vehicle_rc.routes')
 const VehicleInsuranceRoutes = require('./vehicle_insurance/vehicle_insurance.routes')
 const DriverRoutes = require('./driver/driver.routes')
 const DriverDetailsRoutes = require('./driver_details/driver_details.routes')
+const CompanyOperatorRoutes = require('./company_operator/company_operator.routes')
 
 router.use('/category', CategoryRoutes)
 
@@ -56,5 +57,8 @@ router.use('/drivers', DriverRoutes)
 
 router.use('/driver-details', DriverDetailsRoutes)
 router.use('/driver-detail', DriverDetailsRoutes)
+
+router.use('/company-operator', CompanyOperatorRoutes)
+router.use('/company-operator-admin', CompanyOperatorRoutes)
 
 module.exports = router
