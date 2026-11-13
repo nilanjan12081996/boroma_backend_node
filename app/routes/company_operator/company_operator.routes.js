@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const companyOperatorController = require("../../controller/company_operator/company_operator.controller");
 const authCheck = require("../../middleware/authCheck");
+const checkRole = require("../../middleware/checkRole");
+router.use(authCheck, checkRole("SUPERADMIN"))
 
 // ----------------------------------------------------
 // CREATE / REGISTER OPERATOR
