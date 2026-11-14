@@ -35,7 +35,7 @@ const BookingDetails = sequelize.define(
       allowNull: true,
     },
 
-    car_type: {
+    vehicle_type: {
       type: DataTypes.BIGINT,
       allowNull: true,
       references: {
@@ -87,12 +87,12 @@ const BookingDetails = sequelize.define(
 BookingDetails.belongsTo(Guest, { foreignKey: "guest_id", as: "guest" });
 Guest.hasMany(BookingDetails, { foreignKey: "guest_id", as: "bookings" });
 
-// Category Associations (transport_type & car_type)
+// Category Associations (transport_type & vehicle_type)
 BookingDetails.belongsTo(Category, { foreignKey: "transport_type", as: "transportType" });
 Category.hasMany(BookingDetails, { foreignKey: "transport_type", as: "transportBookings" });
 
-BookingDetails.belongsTo(Category, { foreignKey: "car_type", as: "carType" });
-Category.hasMany(BookingDetails, { foreignKey: "car_type", as: "carTypeBookings" });
+BookingDetails.belongsTo(Category, { foreignKey: "vehicle_type", as: "vehicleType" });
+Category.hasMany(BookingDetails, { foreignKey: "vehicle_type", as: "vehicleBookings" });
 
 module.exports = BookingDetails;
 

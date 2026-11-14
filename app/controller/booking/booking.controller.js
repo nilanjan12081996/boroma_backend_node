@@ -23,8 +23,8 @@ const generateBookingId = () => {
  *   date: "2026-11-20",
  *   pickup_place: "Airport",
  *   seat_require: 4,
- *   car_type: 2,                  // Category ID
- *   transport_type: 1,            // Category ID
+ *   vehicle_type: 23,             // Category ID (or car_type)
+ *   transport_type: 30,           // Category ID
  *   booking_id: "BK-12345"        // optional (auto-generated if omitted)
  * }
  */
@@ -40,9 +40,12 @@ exports.createBooking = async (req, res) => {
       pickup_place,
       seat_require,
       car_type,
+      vehicle_type,
       transport_type,
       status,
     } = req.body;
+
+    const targetVehicleType = vehicle_type !== undefined ? vehicle_type : car_type;
 
     // --- Validations ---
     if (!guest_name || !guest_name.trim()) {
@@ -109,14 +112,14 @@ exports.createBooking = async (req, res) => {
       );
     }
 
-    // --- Step 2: Validate car_type and transport_type against Category table ---
-    if (car_type) {
-      const carCat = await Category.findByPk(car_type, { transaction: t });
-      if (!carCat) {
+    // --- Step 2: Validate vehicle_type and transport_type against Category table ---
+    if (targetVehicleType) {
+      const vehicleCat = await Category.findByPk(targetVehicleType, { transaction: t });
+      if (!vehicleCat) {
         await t.rollback();
         return res.status(400).json({
           success: false,
-          message: `Category with ID ${car_type} for 'car_type' does not exist in category table`,
+          message: `Category with ID ${targetVehicleType} for 'vehicle_type' does not exist in category table`,
         });
       }
     }
@@ -144,7 +147,7 @@ exports.createBooking = async (req, res) => {
         date,
         pickup_place: pickup_place ? pickup_place.trim() : null,
         seat_require: seat_require ? parseInt(seat_require, 10) : null,
-        car_type: car_type ? parseInt(car_type, 10) : null,
+        vehicle_type: targetVehicleType ? parseInt(targetVehicleType, 10) : null,
         transport_type: transport_type ? parseInt(transport_type, 10) : null,
         status: status !== undefined ? status : 1,
       },
@@ -169,7 +172,7 @@ exports.createBooking = async (req, res) => {
         },
         {
           model: Category,
-          as: "carType",
+          as: "vehicleType",
           attributes: ["id", "category_name", "short_name", "status"],
         },
       ],
@@ -208,10 +211,13 @@ exports.updateBooking = async (req, res) => {
       pickup_place,
       seat_require,
       car_type,
+      vehicle_type,
       transport_type,
       status,
       booking_id,
     } = req.body;
+
+    const targetVehicleType = vehicle_type !== undefined ? vehicle_type : car_type;
 
     // Check if booking exists
     const booking = await BookingDetails.findByPk(id, { transaction: t });
@@ -241,19 +247,19 @@ exports.updateBooking = async (req, res) => {
     if (date !== undefined) bookingUpdates.date = date;
     if (pickup_place !== undefined) bookingUpdates.pickup_place = pickup_place ? pickup_place.trim() : null;
     if (seat_require !== undefined) bookingUpdates.seat_require = seat_require ? parseInt(seat_require, 10) : null;
-    
-    if (car_type !== undefined) {
-      if (car_type) {
-        const carCat = await Category.findByPk(car_type, { transaction: t });
-        if (!carCat) {
+
+    if (targetVehicleType !== undefined) {
+      if (targetVehicleType) {
+        const vehicleCat = await Category.findByPk(targetVehicleType, { transaction: t });
+        if (!vehicleCat) {
           await t.rollback();
           return res.status(400).json({
             success: false,
-            message: `Category with ID ${car_type} for 'car_type' does not exist in category table`,
+            message: `Category with ID ${targetVehicleType} for 'vehicle_type' does not exist in category table`,
           });
         }
       }
-      bookingUpdates.car_type = car_type ? parseInt(car_type, 10) : null;
+      bookingUpdates.vehicle_type = targetVehicleType ? parseInt(targetVehicleType, 10) : null;
     }
 
     if (transport_type !== undefined) {
@@ -292,7 +298,7 @@ exports.updateBooking = async (req, res) => {
         },
         {
           model: Category,
-          as: "carType",
+          as: "vehicleType",
           attributes: ["id", "category_name", "short_name", "status"],
         },
       ],
@@ -325,7 +331,7 @@ exports.getAllBookings = async (req, res) => {
       status,
       date,
       transport_type,
-      car_type,
+      vehicle_type,
       page = 1,
       limit = 10,
     } = req.query;
@@ -346,8 +352,9 @@ exports.getAllBookings = async (req, res) => {
       whereConditions.transport_type = transport_type;
     }
 
-    if (car_type) {
-      whereConditions.car_type = car_type;
+    const targetVehicleType = vehicle_type || car_type;
+    if (targetVehicleType) {
+      whereConditions.vehicle_type = targetVehicleType;
     }
 
     if (search && search.trim()) {
@@ -374,7 +381,7 @@ exports.getAllBookings = async (req, res) => {
         },
         {
           model: Category,
-          as: "carType",
+          as: "vehicleType",
           attributes: ["id", "category_name", "short_name", "status"],
         },
       ],
@@ -423,7 +430,7 @@ exports.getBookingById = async (req, res) => {
         },
         {
           model: Category,
-          as: "carType",
+          as: "vehicleType",
           attributes: ["id", "category_name", "short_name", "status"],
         },
       ],
