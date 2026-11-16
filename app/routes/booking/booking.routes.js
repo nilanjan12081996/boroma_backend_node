@@ -6,7 +6,7 @@ const bookingController = require("../../controller/booking/booking.controller")
 router.post("/save", bookingController.createBooking);
 
 
-// Get All Bookings (?search=&status=&date=&transport_type=&car_type=&page=&limit=)
+// Get All Bookings (?search=&status=&date=&transport_type=&vehicle_type=&page=&limit=)
 
 router.get("/getAll", bookingController.getAllBookings);
 
