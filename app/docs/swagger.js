@@ -83,6 +83,18 @@ const swaggerDocument = {
     {
       "name": "Vehicle Insurance",
       "description": "Vehicle Insurance Certificate document management (Upload, Read, Update, Delete, Toggle Status)"
+    },
+    {
+      "name": "Company Operator",
+      "description": "Company operator admin management (Create, Read, Update, Delete, Toggle Status & Approval)"
+    },
+    {
+      "name": "Booking",
+      "description": "Vehicle booking management with unified Guest creation and management"
+    },
+    {
+      "name": "Booking Assign Transport",
+      "description": "Assigning available transports/vehicles to bookings by authorized Admins"
     }
   ],
   "components": {
@@ -1150,6 +1162,497 @@ const swaggerDocument = {
           },
           "vehicle": {
             "$ref": "#/components/schemas/VehicleInfo"
+          }
+        }
+      },
+      "CompanyOperator": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "full_name": {
+            "type": "string",
+            "example": "Rajesh Sharma"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "operator@company.com"
+          },
+          "mobile": {
+            "type": "string",
+            "example": "9876543210"
+          },
+          "avatar": {
+            "type": "string",
+            "nullable": true,
+            "example": "/uploads/avatar.png"
+          },
+          "status_id": {
+            "type": "integer",
+            "nullable": true,
+            "example": 1
+          },
+          "is_active": {
+            "type": "integer",
+            "example": 1,
+            "description": "1 = Active, 0 = Inactive"
+          },
+          "is_approved": {
+            "type": "integer",
+            "example": 0,
+            "description": "1 = Approved, 0 = Pending"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateCompanyOperatorPayload": {
+        "type": "object",
+        "required": [
+          "full_name",
+          "email",
+          "mobile"
+        ],
+        "properties": {
+          "full_name": {
+            "type": "string",
+            "example": "Rajesh Sharma"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "operator@company.com"
+          },
+          "mobile": {
+            "type": "string",
+            "example": "9876543210"
+          }
+        }
+      },
+      "UpdateCompanyOperatorPayload": {
+        "type": "object",
+        "properties": {
+          "full_name": {
+            "type": "string",
+            "example": "Rajesh Sharma Updated"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "operator.new@company.com"
+          },
+          "mobile": {
+            "type": "string",
+            "example": "9876543211"
+          },
+          "avatar": {
+            "type": "string",
+            "example": "/uploads/new-avatar.png"
+          },
+          "status_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "is_active": {
+            "type": "integer",
+            "example": 1
+          },
+          "is_approved": {
+            "type": "integer",
+            "example": 1
+          },
+          "password": {
+            "type": "string",
+            "example": "NewPass@123"
+          }
+        }
+      },
+      "Guest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "guest_name": {
+            "type": "string",
+            "example": "Amit Roy"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "nullable": true,
+            "example": "amit@example.com"
+          },
+          "mobile": {
+            "type": "string",
+            "example": "9876543210"
+          },
+          "status": {
+            "type": "integer",
+            "example": 1
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Booking": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "booking_id": {
+            "type": "string",
+            "example": "BK-445867-2372"
+          },
+          "guest_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-11-20"
+          },
+          "pickup_place": {
+            "type": "string",
+            "nullable": true,
+            "example": "Kolkata Airport"
+          },
+          "seat_require": {
+            "type": "integer",
+            "nullable": true,
+            "example": 4
+          },
+          "vehicle_type": {
+            "type": "integer",
+            "nullable": true,
+            "example": 23,
+            "description": "Category ID for vehicle type"
+          },
+          "transport_type": {
+            "type": "integer",
+            "nullable": true,
+            "example": 30,
+            "description": "Category ID for transport type"
+          },
+          "status": {
+            "type": "integer",
+            "example": 1,
+            "description": "1 = Active/Confirmed, 2 = Assigned, 0 = Cancelled"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "guest": {
+            "$ref": "#/components/schemas/Guest"
+          },
+          "transportType": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "example": 30
+              },
+              "category_name": {
+                "type": "string",
+                "example": "CAR"
+              },
+              "short_name": {
+                "type": "string",
+                "example": "Transport_Type"
+              },
+              "status": {
+                "type": "integer",
+                "example": 1
+              }
+            }
+          },
+          "vehicleType": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "example": 23
+              },
+              "category_name": {
+                "type": "string",
+                "example": "SEDAN"
+              },
+              "short_name": {
+                "type": "string",
+                "example": "Car_Type"
+              },
+              "status": {
+                "type": "integer",
+                "example": 1
+              }
+            }
+          }
+        }
+      },
+      "CreateBookingPayload": {
+        "type": "object",
+        "required": [
+          "guest_name",
+          "mobile",
+          "date"
+        ],
+        "properties": {
+          "guest_name": {
+            "type": "string",
+            "example": "Amit Roy",
+            "description": "Name of the guest"
+          },
+          "mobile": {
+            "type": "string",
+            "example": "9876543210",
+            "description": "Mobile number of the guest"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "amit@example.com",
+            "description": "Email of the guest (optional)"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-11-20",
+            "description": "Booking date (YYYY-MM-DD)"
+          },
+          "pickup_place": {
+            "type": "string",
+            "example": "Kolkata Airport",
+            "description": "Pickup location"
+          },
+          "seat_require": {
+            "type": "integer",
+            "example": 4,
+            "description": "Number of seats required"
+          },
+          "transport_type": {
+            "type": "integer",
+            "example": 30,
+            "description": "Category ID for transport type (e.g. Bus, Car)"
+          },
+          "vehicle_type": {
+            "type": "integer",
+            "example": 23,
+            "description": "Category ID for vehicle type (e.g. Sedan, SUV)"
+          },
+          "booking_id": {
+            "type": "string",
+            "example": "BK-CUSTOM-001",
+            "description": "Optional booking ID (auto-generated if omitted)"
+          }
+        }
+      },
+      "UpdateBookingPayload": {
+        "type": "object",
+        "properties": {
+          "guest_name": {
+            "type": "string",
+            "example": "Amit Roy (Updated)"
+          },
+          "mobile": {
+            "type": "string",
+            "example": "9876543210"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "amit.updated@example.com"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-11-25"
+          },
+          "pickup_place": {
+            "type": "string",
+            "example": "Howrah Railway Station"
+          },
+          "seat_require": {
+            "type": "integer",
+            "example": 5
+          },
+          "transport_type": {
+            "type": "integer",
+            "example": 30
+          },
+          "vehicle_type": {
+            "type": "integer",
+            "example": 23
+          },
+          "status": {
+            "type": "integer",
+            "example": 1,
+            "description": "1 = Active, 2 = Assigned, 0 = Cancelled"
+          },
+          "booking_id": {
+            "type": "string",
+            "example": "BK-445867-2372"
+          }
+        }
+      },
+      "BookingAssignTransport": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "booking_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "transport_id": {
+            "type": "integer",
+            "example": 5,
+            "description": "Assigned Vehicle ID from vehicle_info table"
+          },
+          "transport_type": {
+            "type": "string",
+            "example": "SEDAN",
+            "description": "Type of assigned vehicle"
+          },
+          "approved_by": {
+            "type": "integer",
+            "example": 1,
+            "description": "Admin ID who approved/assigned (from JWT token)"
+          },
+          "approved_type": {
+            "type": "string",
+            "example": "SUPERADMIN",
+            "description": "Role of admin who approved (from JWT token)"
+          },
+          "status": {
+            "type": "integer",
+            "example": 1
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "booking": {
+            "$ref": "#/components/schemas/Booking"
+          },
+          "vehicle": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "example": 5
+              },
+              "vehicle_no": {
+                "type": "string",
+                "example": "WB-01-AB-1234"
+              },
+              "no_of_seat": {
+                "type": "integer",
+                "example": 4
+              },
+              "status": {
+                "type": "integer",
+                "example": 1
+              }
+            }
+          }
+        }
+      },
+      "AssignTransportPayload": {
+        "type": "object",
+        "required": [
+          "booking_id",
+          "transport_id"
+        ],
+        "properties": {
+          "booking_id": {
+            "type": "integer",
+            "example": 1,
+            "description": "Booking ID to assign vehicle for"
+          },
+          "transport_id": {
+            "type": "integer",
+            "example": 5,
+            "description": "Vehicle ID from vehicle_info table"
+          },
+          "transport_type": {
+            "type": "string",
+            "example": "SEDAN",
+            "description": "Transport/Vehicle type name (optional, auto-resolved if omitted)"
+          }
+        }
+      },
+      "AvailableTransport": {
+        "type": "object",
+        "properties": {
+          "transport_id": {
+            "type": "integer",
+            "example": 5
+          },
+          "vehicle_no": {
+            "type": "string",
+            "example": "WB-01-AB-1234"
+          },
+          "no_of_seat": {
+            "type": "integer",
+            "example": 4
+          },
+          "status": {
+            "type": "integer",
+            "example": 1
+          },
+          "transport_type": {
+            "type": "string",
+            "example": "CAR"
+          },
+          "vehicle_type": {
+            "type": "string",
+            "example": "SEDAN"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "example": 23
+                },
+                "category_name": {
+                  "type": "string",
+                  "example": "SEDAN"
+                },
+                "short_name": {
+                  "type": "string",
+                  "example": "Car_Type"
+                }
+              }
+            }
           }
         }
       }
@@ -13795,6 +14298,1101 @@ const swaggerDocument = {
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/company-operator-admin/create": {
+      "post": {
+        "tags": [
+          "Company Operator"
+        ],
+        "summary": "Create a new Company Operator",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCompanyOperatorPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Company Operator created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Company Operator created successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CompanyOperator"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden - SUPERADMIN required"
+          },
+          "409": {
+            "description": "Operator with email/mobile already exists"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/company-operator-admin/get-all": {
+      "get": {
+        "tags": [
+          "Company Operator"
+        ],
+        "summary": "Get all Company Operators (supports search, filters & pagination)",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search by name, email, or mobile"
+          },
+          {
+            "name": "is_active",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            },
+            "description": "Filter by active status"
+          },
+          {
+            "name": "is_approved",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            },
+            "description": "Filter by approved status"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Page number"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Items per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operators fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 15
+                    },
+                    "page": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CompanyOperator"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/company-operator-admin/get/{id}": {
+      "get": {
+        "tags": [
+          "Company Operator"
+        ],
+        "summary": "Get Company Operator by ID",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Operator ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Company Operator fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CompanyOperator"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Operator not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/company-operator-admin/update/{id}": {
+      "patch": {
+        "tags": [
+          "Company Operator"
+        ],
+        "summary": "Update Company Operator details",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Operator ID"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCompanyOperatorPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Company Operator updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Company Operator updated successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CompanyOperator"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Operator not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/company-operator-admin/toggle-status/{id}": {
+      "patch": {
+        "tags": [
+          "Company Operator"
+        ],
+        "summary": "Toggle Company Operator active status (is_active: 1 <-> 0)",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Operator ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Status toggled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Operator status updated successfully"
+                    },
+                    "is_active": {
+                      "type": "integer",
+                      "example": 0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Operator not found"
+          }
+        }
+      }
+    },
+    "/api/company-operator-admin/toggle-approval/{id}": {
+      "patch": {
+        "tags": [
+          "Company Operator"
+        ],
+        "summary": "Toggle Company Operator approval status (is_approved: 1 <-> 0)",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Operator ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Approval toggled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Operator approval status updated successfully"
+                    },
+                    "is_approved": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Operator not found"
+          }
+        }
+      }
+    },
+    "/api/company-operator-admin/delete/{id}": {
+      "delete": {
+        "tags": [
+          "Company Operator"
+        ],
+        "summary": "Delete Company Operator by ID",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Operator ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operator deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Company Operator deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Operator not found"
+          }
+        }
+      }
+    },
+    "/api/booking/save": {
+      "post": {
+        "tags": [
+          "Booking"
+        ],
+        "summary": "Create a new Booking (Unified API: saves Guest + Booking details in single request)",
+        "description": "Guest details (guest_name, mobile, email) will be saved/found in guest table with password/otp as null for future login. Booking record will be created in booking table with auto-generated booking_id.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBookingPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Booking created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Booking created successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Booking"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error - required fields missing or invalid category ID"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/booking/getAll": {
+      "get": {
+        "tags": [
+          "Booking"
+        ],
+        "summary": "Get All Bookings with relations (Guest, TransportType, VehicleType)",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search by booking_id or pickup_place"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by booking status (1 = Active, 2 = Assigned, 0 = Cancelled)"
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Filter by booking date (YYYY-MM-DD)"
+          },
+          {
+            "name": "transport_type",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by transport_type category ID"
+          },
+          {
+            "name": "vehicle_type",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by vehicle_type category ID"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Page number"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Items per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bookings fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 25
+                    },
+                    "page": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "totalPages": {
+                      "type": "integer",
+                      "example": 3
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Booking"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/booking/get/{id}": {
+      "get": {
+        "tags": [
+          "Booking"
+        ],
+        "summary": "Get Single Booking by ID with Guest and Category details",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Booking Record ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Booking fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Booking"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Booking not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/booking/update/{id}": {
+      "put": {
+        "tags": [
+          "Booking"
+        ],
+        "summary": "Update Booking & associated Guest details in single API",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Booking Record ID"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBookingPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Booking updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Booking and Guest details updated successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Booking"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Booking not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Booking"
+        ],
+        "summary": "Update Booking & associated Guest details (PATCH alias)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Booking Record ID"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBookingPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Booking updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Booking and Guest details updated successfully"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Booking"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/booking/delete/{id}": {
+      "delete": {
+        "tags": [
+          "Booking"
+        ],
+        "summary": "Delete Booking by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Booking Record ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Booking deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Booking deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Booking not found"
+          }
+        }
+      }
+    },
+    "/api/booking-assign/available-transports": {
+      "get": {
+        "tags": [
+          "Booking Assign Transport"
+        ],
+        "summary": "Get Available Transports / Vehicles for assignment",
+        "description": "Returns active vehicles with their transport_type, vehicle_type, and seat capacity. Can optionally filter matching a booking.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "booking_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Optional booking ID to auto-match required seats & vehicle_type"
+          },
+          {
+            "name": "vehicle_type",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Category ID for vehicle type filter"
+          },
+          {
+            "name": "min_seats",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Minimum seats required filter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Available transports fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Available transports fetched successfully"
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 5
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AvailableTransport"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/booking-assign/available-transports/{booking_id}": {
+      "get": {
+        "tags": [
+          "Booking Assign Transport"
+        ],
+        "summary": "Get Available Transports tailored to a specific Booking",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "booking_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Booking ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Available transports matching booking requirements",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 3
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AvailableTransport"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Booking not found"
+          }
+        }
+      }
+    },
+    "/api/booking-assign/assign": {
+      "post": {
+        "tags": [
+          "Booking Assign Transport"
+        ],
+        "summary": "Assign Transport / Vehicle to a Booking",
+        "description": "approved_by and approved_type are automatically extracted from the authenticated admin JWT token (req.user.id and req.user.role). Also marks booking status as 2 (Assigned).",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignTransportPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Transport assigned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Transport assigned successfully to booking"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BookingAssignTransport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "booking_id or transport_id missing"
+          },
+          "401": {
+            "description": "Unauthorized - Token required"
+          },
+          "404": {
+            "description": "Booking or Vehicle not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/booking-assign/getAll": {
+      "get": {
+        "tags": [
+          "Booking Assign Transport"
+        ],
+        "summary": "Get all assigned transports / vehicle assignments",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "booking_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by booking ID"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by status"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Assigned transports fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "total": {
+                      "type": "integer",
+                      "example": 10
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/BookingAssignTransport"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/booking-assign/by-booking/{booking_id}": {
+      "get": {
+        "tags": [
+          "Booking Assign Transport"
+        ],
+        "summary": "Get assigned transport details for a specific Booking",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "booking_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Booking ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Assigned transport details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BookingAssignTransport"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No transport assigned yet for this booking"
           }
         }
       }
