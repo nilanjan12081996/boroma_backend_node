@@ -20,6 +20,7 @@ const DriverDetailsRoutes = require('./driver_details/driver_details.routes')
 const CompanyOperatorRoutes = require('./company_operator/company_operator.routes')
 const BookingRoutes = require('./booking/booking.routes')
 const BookingAssignTransportRoutes = require('./booking_assign_transport/booking_assign_transport.routes')
+const BookingPassangerListRoutes = require('./booking_passanger_list/booking_passanger_list.routes')
 
 router.use('/category', CategoryRoutes)
 
@@ -68,5 +69,9 @@ router.use('/bookings', BookingRoutes)
 
 router.use('/booking-assign-transport', BookingAssignTransportRoutes)
 router.use('/booking-assign', BookingAssignTransportRoutes)
+
+router.use('/booking-passanger-list', BookingPassangerListRoutes)
+router.use('/booking-passenger-list', BookingPassangerListRoutes)
+router.use('/booking-passengers', BookingPassangerListRoutes)
 
 module.exports = router
